@@ -8,12 +8,72 @@ function Game(props) {
   const boardSize = 8; // Game Board size
   const numOfMines = 10; // Number of mines
   const [gameboard, setGameboard] = useState([]);
+  const [revealStatus, setRevealStatus] = useState([]);
+  const [flaggedStatus, setFlaggedStatus] = useState([]);
+
+  const isValidTile = (row, col) => {
+    return row >= 0 && col >=0 && row < boardSize && col < boardSize;
+  }
+
+  const isFullyRevealed = () => {
+    for (let row = 0; row < boardSize; row++) {
+      for (let col = 0; col < boardSize; col++) {
+        if (revealStatus[row][col] !== true) {
+          return false; // Found an entry that is not true
+        }
+      }
+    }
+    return true; // All entries are true
+  }
+
+  const revealTile = (row, col) => {
+    if(!isValidTile(row,col)) { return; } // Outside the board
+    if(revealStatus[row][col]) { return; } // Already revealed
+    const updatedRevealStatus = [...revealStatus]; 
+    // Update the specified row and col with true
+    updatedRevealStatus[row][col] = true;
+  
+    // Update the state
+    setRevealStatus(updatedRevealStatus);
+
+    // If 0, reveal neighboring tiles recursively
+    if(gameboard[row][col] === 0){
+      for (let rowOffset = -1; rowOffset <= 1; rowOffset++) {
+        for (let colOffset = -1; colOffset <= 1; colOffset++) {
+          if(rowOffset === 0 && colOffset === 0) { continue; }
+          const newRow = row + rowOffset;
+          const newCol = col + colOffset;
+          revealTile(newRow, newCol);
+        }
+      }
+    }
+
+    // If all tiles are revealed, reinitialize
+    if(isFullyRevealed()){
+      setTimeout(() => {
+        initializeBoard(boardSize);
+      }, 2000);
+    }
+  }
+
+  const flagTile = (row, col) => {
+    if(!isValidTile(row,col)) { return; } // Outside the board
+    const updatedFlaggedStatus = [...flaggedStatus]; 
+    // Update the specified row and col with true
+    updatedFlaggedStatus[row][col] = true;
+  
+    // Update the state
+    setFlaggedStatus(updatedFlaggedStatus);
+  }
 
   const initializeBoard = (size) => {
+    setGameboard([]);
     let newBoard = Array.from({ length: size }, () => Array(size).fill(0)); //Fill array with zeroes
+    setRevealStatus(Array.from({ length: size }, () => Array(size).fill(false)));
+    setFlaggedStatus(Array.from({ length: size }, () => Array(size).fill(false)));
 
     function increaseMineCount(row, col) {
-      if(row < 0 || col < 0 || row >= size || col >= size) { return; } // Outside the board
+      if(!isValidTile(row,col)) { return; } // Outside the board
       if(newBoard[row][col] === '*') { return; } // Already a mine
       newBoard[row][col]++;
     }
@@ -46,7 +106,7 @@ function Game(props) {
 
   return (
     <>
-      <Minefield gameboard={gameboard} />
+      <Minefield gameboard={gameboard} revealStatus={revealStatus} flaggedStatus={flaggedStatus} revealTile={revealTile} flagTile={flagTile} />
     </>
   );
 }
