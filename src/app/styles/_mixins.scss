@@ -1,0 +1,3 @@
+@function varSize($x) {
+  @return min(#{$x + 'px'}, #{$x/16 + 'vw'});
+}

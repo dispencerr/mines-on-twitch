@@ -1,0 +1,12 @@
+@import '@/app/styles/mixins';
+
+.tile {
+  width: varSize(60);
+  height: varSize(60);
+  line-height: varSize(60);
+  border: 1px solid gray;
+  text-align: center;
+  font-size: varSize(18);
+  margin-bottom: -1px;
+  margin-right: -1px;
+}
