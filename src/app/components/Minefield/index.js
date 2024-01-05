@@ -5,7 +5,7 @@ function Minefield(props) {
   const { gameboard, revealStatus, flaggedStatus={flaggedStatus}, revealTile, flagTile } = props;
 
   return (
-    <div>
+    <div onContextMenu={(e) => {e.preventDefault()}}>
       {gameboard.map((row, rowIndex) => (
         <div className={styles.row} key={rowIndex}>
           {row.map((cell, colIndex) => (
