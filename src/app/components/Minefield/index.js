@@ -9,7 +9,7 @@ function Minefield(props) {
       {gameboard.map((row, rowIndex) => (
         <div className={styles.row} key={rowIndex}>
           {row.map((cell, colIndex) => (
-            <MinefieldTile row={rowIndex} col={colIndex+1} />
+            <MinefieldTile row={rowIndex} col={colIndex+1} content={cell} />
           ))}
         </div>
       ))}
