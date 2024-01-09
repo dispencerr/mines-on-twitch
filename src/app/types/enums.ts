@@ -1,5 +1,5 @@
 export enum TileContent {
-  Zero = 0,
+  Zero,
   One,
   Two,
   Three,

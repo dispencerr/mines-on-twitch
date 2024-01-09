@@ -8,13 +8,13 @@ interface MinefieldTileProps {
   content: TileContent;
   isRevealed: boolean;
   isFlagged: boolean;
-  revealTile: Function;
-  flagTile: Function;
+  revealTile: (row: number, col: number) => void;
+  flagTile: (row: number, col: number) => void;
 }
 
 function MinefieldTile({ row, col, content, isRevealed, isFlagged, revealTile, flagTile }: MinefieldTileProps) {
-  const displayCol: number = col + 1;
-  const letters: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const displayCol = col + 1;
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
   /**
    * When a tile is clicked, reveal the tile

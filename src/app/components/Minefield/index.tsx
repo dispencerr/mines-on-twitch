@@ -7,8 +7,8 @@ interface MinefieldProps {
   gameboard: TileContent[][];
   revealStatus: boolean[][];
   flaggedStatus: boolean[][];
-  revealTile: Function;
-  flagTile: Function;
+  revealTile: (row: number, col: number) => void;
+  flagTile: (row: number, col: number) => void;
 }
 
 function Minefield({ gameboard, revealStatus, flaggedStatus, revealTile, flagTile }: MinefieldProps) {
