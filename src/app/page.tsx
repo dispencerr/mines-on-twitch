@@ -1,4 +1,6 @@
-import styles from 'destyle.css'
+import React from 'react';
+import 'destyle.css';
+import styles from './page.module.scss';
 import Game from '@/app/components/Game'
 
 export default function Home() {
