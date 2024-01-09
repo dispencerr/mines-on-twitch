@@ -1,32 +1,35 @@
 'use client'
+import React from 'react';
 import { useState, useEffect } from 'react';
 import styles from'./index.module.scss'
 import Minefield from '@/app/components/Minefield'
+import { TileContent } from '@/app/types/enums'
 
 function Game(props) {
   const { } = props;
   const boardSize = 8; // Game Board size
   const numOfMines = 10; // Number of mines
-  const [gameboard, setGameboard] = useState([]);
-  const [revealStatus, setRevealStatus] = useState([]);
-  const [flaggedStatus, setFlaggedStatus] = useState([]);
+  const boardResetTimeout = 2000; // Delay before resetting the board after it is fully revealed
+  const [gameboard, setGameboard] = useState<TileContent[][]>([]);
+  const [revealStatus, setRevealStatus] = useState<boolean[][]>([]);
+  const [flaggedStatus, setFlaggedStatus] = useState<boolean[][]>([]);
 
-  const isValidTile = (row, col) => {
+  const isValidTile = (row: number, col: number): boolean => {
     return row >= 0 && col >=0 && row < boardSize && col < boardSize;
   }
 
-  const isFullyRevealed = () => {
+  const isFullyRevealed = (): boolean => {
     for (let row = 0; row < boardSize; row++) {
       for (let col = 0; col < boardSize; col++) {
         if (revealStatus[row][col] !== true) {
-          return false; // Found an entry that is not true
+          return false; // Found an unrevealed tile
         }
       }
     }
-    return true; // All entries are true
+    return true; // All tiles are revealed
   }
 
-  const revealTile = (row, col) => {
+  const revealTile = (row: number, col: number): void => {
     if(!isValidTile(row,col)) { return; } // Outside the board
     if(revealStatus[row][col]) { return; } // Already revealed
     const updatedRevealStatus = [...revealStatus]; 
@@ -37,7 +40,7 @@ function Game(props) {
     setRevealStatus(updatedRevealStatus);
 
     // If 0, reveal neighboring tiles recursively
-    if(gameboard[row][col] === 0){
+    if(gameboard[row][col] === TileContent.Zero){
       for (let rowOffset = -1; rowOffset <= 1; rowOffset++) {
         for (let colOffset = -1; colOffset <= 1; colOffset++) {
           if(rowOffset === 0 && colOffset === 0) { continue; }
@@ -52,11 +55,11 @@ function Game(props) {
     if(isFullyRevealed()){
       setTimeout(() => {
         initializeBoard(boardSize);
-      }, 2000);
+      }, boardResetTimeout);
     }
   }
 
-  const flagTile = (row, col) => {
+  const flagTile = (row: number, col: number): void => {
     if(!isValidTile(row,col)) { return; } // Outside the board
     const updatedFlaggedStatus = [...flaggedStatus]; 
     // Update the specified row and col with true
@@ -66,15 +69,15 @@ function Game(props) {
     setFlaggedStatus(updatedFlaggedStatus);
   }
 
-  const initializeBoard = (size) => {
+  const initializeBoard = (size: number): void => {
     setGameboard([]);
-    let newBoard = Array.from({ length: size }, () => Array(size).fill(0)); //Fill array with zeroes
+    let newBoard = Array.from({ length: size }, () => Array(size).fill(TileContent.Zero)); //Fill array with zeroes
     setRevealStatus(Array.from({ length: size }, () => Array(size).fill(false)));
     setFlaggedStatus(Array.from({ length: size }, () => Array(size).fill(false)));
 
-    function increaseMineCount(row, col) {
+    const IncreaseCountOnTile = (row: number, col: number): void => {
       if(!isValidTile(row,col)) { return; } // Outside the board
-      if(newBoard[row][col] === '*') { return; } // Already a mine
+      if(newBoard[row][col] === TileContent.Mine) { return; } // Already a mine
       newBoard[row][col]++;
     }
 
@@ -84,15 +87,15 @@ function Game(props) {
       do {
         randomRowIndex = Math.floor(Math.random() * size);
         randomColIndex = Math.floor(Math.random() * size);
-      } while (newBoard[randomRowIndex][randomColIndex] === '*'); // Ensure the selected index is not already a mine
-      newBoard[randomRowIndex][randomColIndex] = '*';
+      } while (newBoard[randomRowIndex][randomColIndex] === TileContent.Mine); // Ensure the selected index is not already a mine
+      newBoard[randomRowIndex][randomColIndex] = TileContent.Mine;
 
       // Update neighboring tiles
       for (let rowOffset = -1; rowOffset <= 1; rowOffset++) {
         for (let colOffset = -1; colOffset <= 1; colOffset++) {
           const newRow = randomRowIndex + rowOffset;
           const newCol = randomColIndex + colOffset;
-          increaseMineCount(newRow, newCol);
+          IncreaseCountOnTile(newRow, newCol);
         }
       }
     }
@@ -105,9 +108,7 @@ function Game(props) {
   }, []);
 
   return (
-    <>
-      <Minefield gameboard={gameboard} revealStatus={revealStatus} flaggedStatus={flaggedStatus} revealTile={revealTile} flagTile={flagTile} />
-    </>
+    <Minefield gameboard={gameboard} revealStatus={revealStatus} flaggedStatus={flaggedStatus} revealTile={revealTile} flagTile={flagTile} />
   );
 }
 

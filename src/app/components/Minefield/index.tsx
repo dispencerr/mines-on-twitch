@@ -1,8 +1,17 @@
+import React from 'react';
 import styles from'./index.module.scss'
 import MinefieldTile from '@/app/components/MinefieldTile'
+import { TileContent } from '@/app/types/enums';
 
-function Minefield(props) {
-  const { gameboard, revealStatus, flaggedStatus={flaggedStatus}, revealTile, flagTile } = props;
+interface MinefieldProps {
+  gameboard: TileContent[][];
+  revealStatus: boolean[][];
+  flaggedStatus: boolean[][];
+  revealTile: Function;
+  flagTile: Function;
+}
+
+function Minefield({ gameboard, revealStatus, flaggedStatus, revealTile, flagTile }: MinefieldProps) {
 
   return (
     <div onContextMenu={(e) => {e.preventDefault()}}>
