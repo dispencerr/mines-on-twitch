@@ -227,32 +227,46 @@ const Game: React.FC<GameProps> = ({ client }) => {
   }, [getChatMessages]);
 
   return (
-    <div className={styles.game}>
-      <div className={styles.leftContainer}>
-        <Scoreboard getUserScores={getUserScores} />
-      </div>
-      <div className={styles.middleContainer}>
-        <Minefield
-          gameboard={gameboard}
-          revealStatus={revealStatus}
-          flaggedStatus={flaggedStatus}
-          revealTile={revealTile}
-          flagTile={flagTile}
-        />
-      </div>
-      <div className={styles.rightContainer}>
-        <div className={styles.wordBlockContainer}>
-          {getChatArray.map((chatEntry, index) => (
-            <ChatEntry chat={chatEntry} key={index} />
-          ))}
+    <>
+      <div className={styles.game}>
+        <div className={styles.leftContainer}>
+          <Scoreboard getUserScores={getUserScores} />
         </div>
-        {!client ? (
-          <EntryField addChatMessage={addChatMessage} />
-        ) : (
-          <EntryField addChatMessage={addChatMessage} />
-        )}
+        <div className={styles.middleContainer}>
+          <Minefield
+            gameboard={gameboard}
+            revealStatus={revealStatus}
+            flaggedStatus={flaggedStatus}
+            revealTile={revealTile}
+            flagTile={flagTile}
+          />
+        </div>
+        <div className={styles.rightContainer}>
+          <div className={styles.wordBlockContainer}>
+            {getChatArray.map((chatEntry, index) => (
+              <ChatEntry chat={chatEntry} key={index} />
+            ))}
+          </div>
+          {!client ? (
+            <EntryField addChatMessage={addChatMessage} />
+          ) : (
+            <EntryField addChatMessage={addChatMessage} />
+          )}
+        </div>
       </div>
-    </div>
+      <div className={styles.howToPlay}>
+        <h3 className={styles.howToPlay__head}>How to Play:</h3>
+        <p className={styles.howToPlay__text}>"A3": Open tile A3</p>
+        <p className={styles.howToPlay__text}>"B6f": Flag tile B6</p>
+        <p className={styles.howToPlay__text}>
+          The number on a tile indicates how many of the surrounding tiles
+          (including diagonals) are mines. Gain points by opening safe tiles (+
+          {CORRECT_CHECK_SCORE}) and flagging mines (+{CORRECT_FLAG_SCORE}).
+          Lose points if you open a mine ({INCORRECT_CHECK_SCORE}) or flag a
+          safe tile ({INCORRECT_FLAG_SCORE}).
+        </p>
+      </div>
+    </>
   );
 };
 

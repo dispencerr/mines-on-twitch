@@ -11,7 +11,7 @@
 }
 
 .middleContainer {
-  width: varSize(760);
+  width: varSize(472);
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -33,6 +33,23 @@
   justify-content: flex-end;
   align-items: flex-start;
   overflow-y: clip;
-  max-height: 233px;
+  max-height: varSize(233);
   width: 100%;
+}
+
+.howToPlay {
+  margin-top: varSize(50);
+  width: varSize(768);
+  color: #aaa;
+
+  &__head {
+    font-weight: bold;
+    font-size: varSize(30);
+    margin-bottom: varSize(20);
+  }
+
+  &__text {
+    font-size: varSize(18);
+    margin-bottom: varSize(10);
+  }
 }
