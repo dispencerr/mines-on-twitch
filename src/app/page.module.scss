@@ -1,7 +1,12 @@
+@import "@/app/styles/mixins";
+
 .main {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
   align-items: center;
   padding: 6rem;
+  background-color: #18181b;
+  color: white;
   min-height: 100vh;
 }

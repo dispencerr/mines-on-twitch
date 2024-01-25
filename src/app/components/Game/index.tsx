@@ -1,14 +1,18 @@
-"use client";
 import React from "react";
 import { useState, useEffect, useRef } from "react";
 import styles from "./index.module.scss";
 import Minefield from "@/app/components/Minefield";
 import { TileContent } from "@/app/types/enums";
-import { Chat } from "@/app/types/types";
+import { Chat, TmiClient } from "@/app/types/types";
 import ChatEntry from "@/app/components/ChatEntry";
 import EntryField from "@/app/components/EntryField";
+import { Client } from "tmi.js";
 
-const Game: React.FC = () => {
+type GameProps = {
+  client: Client;
+};
+
+const Game: React.FC<GameProps> = ({ client }) => {
   const minesweeperGuessRegex = /^[a-hA-H][1-8](f|F)?$/i;
   const boardSize = 8; // Game Board size
   const numOfMines = 10; // Number of mines
@@ -18,8 +22,19 @@ const Game: React.FC = () => {
   const [flaggedStatus, setFlaggedStatus] = useState<boolean[][]>([]);
   const [getGuessArray, setGuessArray] = useState<string[]>([]);
   const [getChatArray, setChatArray] = useState<Chat[]>([]); // The displayed chatbox (only of valid guesses)
-  const [getChatMessages, setChatMessages] = useState<Chat[]>([]); // Array of all chats (notdisplayed)
+  const [getChatMessages, setChatMessages] = useState<Chat[]>([]); // Array of all chats (not displayed)
   const prevDependencyRef = useRef<Chat[]>();
+
+  if (client) {
+    client.on("message", (channel, tags, message, self) => {
+      const newChat: Chat = {
+        message: message,
+        user: tags["display-name"],
+        color: tags["color"],
+      };
+      addChatMessage(newChat);
+    });
+  }
 
   const isValidTile = (row: number, col: number): boolean => {
     return row >= 0 && col >= 0 && row < boardSize && col < boardSize;
@@ -135,7 +150,7 @@ const Game: React.FC = () => {
       letter.toLowerCase().charCodeAt(0) - "a".charCodeAt(0);
     const [, letter, numberStr, flag] =
       newChat.message.match(/^([a-hA-H])([1-8])(f|F)?$/i) || [];
-    console.log(letter, numberStr, flag);
+    // console.log(letter, numberStr, flag);
     if (letter && numberStr) {
       const row = letterToNumber(letter);
       const col = parseInt(numberStr) - 1; // Convert the number to 0-indexed
@@ -175,7 +190,7 @@ const Game: React.FC = () => {
   }, [getChatMessages]);
 
   return (
-    <>
+    <div className={styles.game}>
       <Minefield
         gameboard={gameboard}
         revealStatus={revealStatus}
@@ -193,7 +208,7 @@ const Game: React.FC = () => {
         <EntryField addChatMessage={addChatMessage} />
         {/* ) : (null)} */}
       </div>
-    </>
+    </div>
   );
 };
 

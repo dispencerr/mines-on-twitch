@@ -5,6 +5,9 @@ import { Chat, RGBColor } from "@/app/types/types";
 type ChatEntryProps = { chat: Chat };
 
 const ChatEntry: React.FC<ChatEntryProps> = ({ chat }) => {
+  const color = chat.color || "#ffffff";
+  const user = chat.user || "User";
+
   const hexToRGB = (hexCode: string): RGBColor => {
     hexCode = hexCode.replace("#", "");
     const r = parseInt(hexCode.substring(0, 2), 16);
@@ -33,7 +36,7 @@ const ChatEntry: React.FC<ChatEntryProps> = ({ chat }) => {
   };
 
   const adjustConstrast = (hexCode: string): string => {
-    const background: RGBColor = hexToRGB("#FFFFFF");
+    const background: RGBColor = hexToRGB("#18181b");
     const color: RGBColor = hexToRGB(hexCode);
 
     const currentContrast = contrastRatio(color, background);
@@ -57,11 +60,8 @@ const ChatEntry: React.FC<ChatEntryProps> = ({ chat }) => {
   return (
     <div className={styles.blockCont}>
       <div className={styles.block}>
-        <span
-          className={styles.user}
-          style={{ color: adjustConstrast(chat.color) }}
-        >
-          {chat.user.length <= 10 ? chat.user : chat.user.slice(0, 7) + "..."}
+        <span className={styles.user} style={{ color: adjustConstrast(color) }}>
+          {user.length <= 10 ? user : user.slice(0, 7) + "..."}
         </span>
         <div className={styles.word}>{chat.message}</div>
       </div>

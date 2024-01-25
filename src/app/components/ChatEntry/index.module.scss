@@ -1,3 +1,5 @@
+@import "@/app/styles/mixins";
+
 .blockCont {
   overflow-y: clip;
 }
@@ -7,14 +9,15 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 15px;
+  padding-top: varSize(15);
   width: 100%;
 }
 
 .user {
   font-weight: bold;
-  margin-right: 10px;
+  margin-right: varSize(10);
   align-self: center;
+  min-width: varSize(140);
 }
 
 .word {
@@ -24,8 +27,8 @@
 
 .scoreBonus {
   position: absolute;
-  left: -50px;
-  font-size: 30px;
+  left: varSize(-50);
+  font-size: varSize(30);
   font-weight: bold;
   color: forestgreen;
   opacity: 0;

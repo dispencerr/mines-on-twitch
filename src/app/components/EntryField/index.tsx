@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, KeyboardEvent, ChangeEvent } from "react";
 import styles from "./index.module.scss";
 import { Chat } from "@/app/types/types";
 
@@ -7,26 +7,26 @@ type EntryFieldProps = {
 };
 
 const EntryField: React.FC<EntryFieldProps> = ({ addChatMessage }) => {
-  const [getEntry, setEntry] = useState<string>("");
+  const [getEntry, setEntry] = useState("");
   const wordInputRef = useRef<HTMLInputElement | null>(null);
-  const handleInputChange = (event) => {
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setEntry(event.target.value);
   };
 
-  const handleKeyPress = (event) => {
+  const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>): void => {
     if (event.key === "Enter") {
       handleButtonClick();
     }
   };
 
-  const handleButtonClick = () => {
+  const handleButtonClick = (): void => {
     if (wordInputRef.current) {
       wordInputRef.current.value = ""; // Clear input field
     }
     const newChat: Chat = {
       user: "User",
       message: getEntry,
-      color: "#000000",
+      color: "#FFFFFF",
     };
     addChatMessage(newChat);
   };
