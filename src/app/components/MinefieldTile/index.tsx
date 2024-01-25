@@ -43,12 +43,53 @@ const MinefieldTile: React.FC<MinefieldTileProps> = ({
     flagTile(row, col);
   };
 
+  const getRevealedTileClasses = (): string => {
+    let classString = `${styles.tile}`;
+
+    switch (content) {
+      case TileContent.Mine:
+        classString += ` ${styles.isMine}`;
+        break;
+      case TileContent.Zero:
+        classString += ` ${styles.isNumberZero}`;
+        break;
+      case TileContent.One:
+        classString += ` ${styles.isNumberOne}`;
+        break;
+      case TileContent.Two:
+        classString += ` ${styles.isNumberTwo}`;
+        break;
+      case TileContent.Three:
+        classString += ` ${styles.isNumberThree}`;
+        break;
+      case TileContent.Four:
+        classString += ` ${styles.isNumberFour}`;
+        break;
+      case TileContent.Five:
+        classString += ` ${styles.isNumberFive}`;
+        break;
+      case TileContent.Six:
+        classString += ` ${styles.isNumberSix}`;
+        break;
+      case TileContent.Seven:
+        classString += ` ${styles.isNumberSeven}`;
+        break;
+      case TileContent.Eight:
+        classString += ` ${styles.isNumberEight}`;
+        break;
+      default:
+        break;
+    }
+
+    if (isFlagged) {
+      classString += ` ${styles.isFlagged}`;
+    }
+
+    return classString;
+  };
+
   return isRevealed ? (
-    <div
-      className={`${styles.tile} ${
-        content === TileContent.Mine ? styles.isMine : ""
-      } ${isFlagged ? styles.isFlagged : ""}`}
-    >
+    <div className={getRevealedTileClasses()}>
       {content === TileContent.Mine ? (isFlagged ? "🚩" : "💣") : content}
     </div>
   ) : (
