@@ -3,7 +3,8 @@ import { useState, useEffect, useRef } from "react";
 import styles from "./index.module.scss";
 import Minefield from "@/app/components/Minefield";
 import { TileContent } from "@/app/types/enums";
-import { Chat, TmiClient } from "@/app/types/types";
+import { Chat, Scores } from "@/app/types/types";
+import Scoreboard from "@/app/components/Scoreboard";
 import ChatEntry from "@/app/components/ChatEntry";
 import EntryField from "@/app/components/EntryField";
 import { Client } from "tmi.js";
@@ -12,17 +13,23 @@ type GameProps = {
   client: Client;
 };
 
+const MINESWEEPER_GUESS_REGEX = /^([a-hA-H])([1-8])(f|F)?$/i;
+const BOARD_RESET_TIMEOUT = 2000; // Delay before resetting the board after it is fully revealed
+
+const CORRECT_CHECK_SCORE = 1; // Score change for checking a safe tile
+const INCORRECT_CHECK_SCORE = -6; // Score change for setting off a mine
+const CORRECT_FLAG_SCORE = 2; // Score change for correctly flagging a mine
+const INCORRECT_FLAG_SCORE = -2; // Score change for incorrectly flagging a safe tile
+
 const Game: React.FC<GameProps> = ({ client }) => {
-  const minesweeperGuessRegex = /^[a-hA-H][1-8](f|F)?$/i;
   const boardSize = 8; // Game Board size
   const numOfMines = 10; // Number of mines
-  const boardResetTimeout = 2000; // Delay before resetting the board after it is fully revealed
   const [gameboard, setGameboard] = useState<TileContent[][]>([]);
   const [revealStatus, setRevealStatus] = useState<boolean[][]>([]);
   const [flaggedStatus, setFlaggedStatus] = useState<boolean[][]>([]);
-  const [getGuessArray, setGuessArray] = useState<string[]>([]);
   const [getChatArray, setChatArray] = useState<Chat[]>([]); // The displayed chatbox (only of valid guesses)
   const [getChatMessages, setChatMessages] = useState<Chat[]>([]); // Array of all chats (not displayed)
+  const [getUserScores, setUserScores] = useState<Scores>({});
   const prevDependencyRef = useRef<Chat[]>();
 
   if (client) {
@@ -83,20 +90,39 @@ const Game: React.FC<GameProps> = ({ client }) => {
     if (isFullyRevealed()) {
       setTimeout(() => {
         initializeBoard(boardSize);
-      }, boardResetTimeout);
+      }, BOARD_RESET_TIMEOUT);
     }
   };
 
-  const flagTile = (row: number, col: number): void => {
-    if (!isValidTile(row, col)) {
-      return;
-    } // Outside the board
-    const updatedFlaggedStatus = [...flaggedStatus];
-    // Update the specified row and col with true
-    updatedFlaggedStatus[row][col] = true;
+  const checkTile = (row: number, col: number, user?: string): void => {
+    // Update score based on if it's a bomb
+    if (user) {
+      if (gameboard[row][col] === TileContent.Mine) {
+        updateScores(user, INCORRECT_CHECK_SCORE);
+      } else {
+        updateScores(user, CORRECT_CHECK_SCORE);
+      }
+    }
 
+    revealTile(row, col);
+  };
+
+  const flagTile = (row: number, col: number, user?: string): void => {
     // Update the state
+    const updatedFlaggedStatus = [...flaggedStatus];
+    updatedFlaggedStatus[row][col] = true;
     setFlaggedStatus(updatedFlaggedStatus);
+
+    // Update score based on if it's a bomb
+    if (user) {
+      if (gameboard[row][col] === TileContent.Mine) {
+        updateScores(user, CORRECT_FLAG_SCORE);
+      } else {
+        updateScores(user, INCORRECT_FLAG_SCORE);
+      }
+    }
+
+    // Reveal the tile
     revealTile(row, col);
   };
 
@@ -144,37 +170,48 @@ const Game: React.FC<GameProps> = ({ client }) => {
     setGameboard([...newBoard]);
   };
 
-  const handleValidGuess = (newChat: Chat) => {
+  // Function called when a new tile is guessed
+  const handleChatEntry = (newChat: Chat) => {
+    let userGuess = newChat.message.trim(); //twitch adds white space to allow the broadcaster to repeat the same chat repeatedly it seems
+
     // Convert the letter to a number (0-indexed)
     const letterToNumber = (letter: string): number =>
       letter.toLowerCase().charCodeAt(0) - "a".charCodeAt(0);
-    const [, letter, numberStr, flag] =
-      newChat.message.match(/^([a-hA-H])([1-8])(f|F)?$/i) || [];
-    // console.log(letter, numberStr, flag);
-    if (letter && numberStr) {
-      const row = letterToNumber(letter);
-      const col = parseInt(numberStr) - 1; // Convert the number to 0-indexed
-      if (flag) {
-        flagTile(row, col);
-      } else {
-        revealTile(row, col);
-      }
-      setGuessArray((prevGuessArray) => [...prevGuessArray, newChat.message]);
-      setChatArray((prevChatArray) => [...prevChatArray, newChat]);
-    }
-  };
 
-  // Function called when a new word is guessed
-  const handleWordEntry = (newChat: Chat) => {
-    let userGuess = newChat.message.trim(); //twitch adds white space to allow the broadcaster to repeat the same chat repeatedly it seems
-    if (minesweeperGuessRegex.test(userGuess)) {
-      // TODO: Check for timeout, check if already guessed, etc
-      handleValidGuess(newChat);
+    //Check that the chat message matches the regex for a valid guess
+    const [, letter, numberStr, flag] =
+      userGuess.match(MINESWEEPER_GUESS_REGEX) || [];
+    // console.log(userGuess);
+    // console.log(letter, numberStr, flag);
+
+    if (letter && numberStr) {
+      // console.log("Valid guess");
+      // TODO: Check for timeout
+      const row = letterToNumber(letter); // Convert the number to 0-indexed number
+      const col = parseInt(numberStr) - 1; // Convert the number to 0-indexed
+      if (isValidTile(row, col) && !revealStatus[row][col]) {
+        if (flag) {
+          flagTile(row, col, newChat.user);
+        } else {
+          checkTile(row, col, newChat.user);
+        }
+        setChatArray((prevChatArray) => [...prevChatArray, newChat]);
+      }
     }
   };
 
   const addChatMessage = (newChat: Chat): void => {
     setChatMessages((prevChatMessages) => [...prevChatMessages, newChat]);
+  };
+
+  const updateScores = (user: string, scoreChange: number) => {
+    let currentScore = getUserScores[user] || 0;
+    let newScore = currentScore + scoreChange;
+    // console.log(user + "'s new score: " + newScore);
+    setUserScores((prevScores) => ({
+      ...prevScores,
+      [user]: newScore,
+    }));
   };
 
   useEffect(() => {
@@ -184,27 +221,36 @@ const Game: React.FC<GameProps> = ({ client }) => {
   useEffect(() => {
     if (prevDependencyRef.current !== undefined && getChatMessages.length) {
       let latestChat = getChatMessages[getChatMessages.length - 1];
-      handleWordEntry(latestChat);
+      handleChatEntry(latestChat);
     }
     prevDependencyRef.current = getChatMessages;
   }, [getChatMessages]);
 
   return (
     <div className={styles.game}>
-      <Minefield
-        gameboard={gameboard}
-        revealStatus={revealStatus}
-        flaggedStatus={flaggedStatus}
-        revealTile={revealTile}
-        flagTile={flagTile}
-      />
+      <div className={styles.leftContainer}>
+        <Scoreboard getUserScores={getUserScores} />
+      </div>
+      <div className={styles.middleContainer}>
+        <Minefield
+          gameboard={gameboard}
+          revealStatus={revealStatus}
+          flaggedStatus={flaggedStatus}
+          revealTile={revealTile}
+          flagTile={flagTile}
+        />
+      </div>
       <div className={styles.rightContainer}>
         <div className={styles.wordBlockContainer}>
           {getChatArray.map((chatEntry, index) => (
             <ChatEntry chat={chatEntry} key={index} />
           ))}
         </div>
-        {!client ? <EntryField addChatMessage={addChatMessage} /> : null}
+        {!client ? (
+          <EntryField addChatMessage={addChatMessage} />
+        ) : (
+          <EntryField addChatMessage={addChatMessage} />
+        )}
       </div>
     </div>
   );
