@@ -1,0 +1,32 @@
+.blockCont {
+  overflow-y: clip;
+}
+
+.block {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 15px;
+  width: 100%;
+}
+
+.user {
+  font-weight: bold;
+  margin-right: 10px;
+  align-self: center;
+}
+
+.word {
+  display: flex;
+  align-items: center;
+}
+
+.scoreBonus {
+  position: absolute;
+  left: -50px;
+  font-size: 30px;
+  font-weight: bold;
+  color: forestgreen;
+  opacity: 0;
+}

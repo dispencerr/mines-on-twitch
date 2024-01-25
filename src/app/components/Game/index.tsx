@@ -1,18 +1,25 @@
 "use client";
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import styles from "./index.module.scss";
 import Minefield from "@/app/components/Minefield";
 import { TileContent } from "@/app/types/enums";
+import { Chat } from "@/app/types/types";
+import ChatEntry from "@/app/components/ChatEntry";
+import EntryField from "@/app/components/EntryField";
 
-function Game(props) {
-  const {} = props;
+const Game: React.FC = () => {
+  const minesweeperGuessRegex = /^[a-hA-H][1-8](f|F)?$/i;
   const boardSize = 8; // Game Board size
   const numOfMines = 10; // Number of mines
   const boardResetTimeout = 2000; // Delay before resetting the board after it is fully revealed
   const [gameboard, setGameboard] = useState<TileContent[][]>([]);
   const [revealStatus, setRevealStatus] = useState<boolean[][]>([]);
   const [flaggedStatus, setFlaggedStatus] = useState<boolean[][]>([]);
+  const [getGuessArray, setGuessArray] = useState<string[]>([]);
+  const [getChatArray, setChatArray] = useState<Chat[]>([]); // The displayed chatbox (only of valid guesses)
+  const [getChatMessages, setChatMessages] = useState<Chat[]>([]); // Array of all chats (notdisplayed)
+  const prevDependencyRef = useRef<Chat[]>();
 
   const isValidTile = (row: number, col: number): boolean => {
     return row >= 0 && col >= 0 && row < boardSize && col < boardSize;
@@ -75,6 +82,7 @@ function Game(props) {
 
     // Update the state
     setFlaggedStatus(updatedFlaggedStatus);
+    revealTile(row, col);
   };
 
   const initializeBoard = (size: number): void => {
@@ -121,19 +129,72 @@ function Game(props) {
     setGameboard([...newBoard]);
   };
 
+  const handleValidGuess = (newChat: Chat) => {
+    // Convert the letter to a number (0-indexed)
+    const letterToNumber = (letter: string): number =>
+      letter.toLowerCase().charCodeAt(0) - "a".charCodeAt(0);
+    const [, letter, numberStr, flag] =
+      newChat.message.match(/^([a-hA-H])([1-8])(f|F)?$/i) || [];
+    console.log(letter, numberStr, flag);
+    if (letter && numberStr) {
+      const row = letterToNumber(letter);
+      const col = parseInt(numberStr) - 1; // Convert the number to 0-indexed
+      if (flag) {
+        flagTile(row, col);
+      } else {
+        revealTile(row, col);
+      }
+      setGuessArray((prevGuessArray) => [...prevGuessArray, newChat.message]);
+      setChatArray((prevChatArray) => [...prevChatArray, newChat]);
+    }
+  };
+
+  // Function called when a new word is guessed
+  const handleWordEntry = (newChat: Chat) => {
+    let userGuess = newChat.message.trim(); //twitch adds white space to allow the broadcaster to repeat the same chat repeatedly it seems
+    if (minesweeperGuessRegex.test(userGuess)) {
+      // TODO: Check for timeout, check if already guessed, etc
+      handleValidGuess(newChat);
+    }
+  };
+
+  const addChatMessage = (newChat: Chat): void => {
+    setChatMessages((prevChatMessages) => [...prevChatMessages, newChat]);
+  };
+
   useEffect(() => {
     initializeBoard(boardSize);
   }, []);
 
+  useEffect(() => {
+    if (prevDependencyRef.current !== undefined && getChatMessages.length) {
+      let latestChat = getChatMessages[getChatMessages.length - 1];
+      handleWordEntry(latestChat);
+    }
+    prevDependencyRef.current = getChatMessages;
+  }, [getChatMessages]);
+
   return (
-    <Minefield
-      gameboard={gameboard}
-      revealStatus={revealStatus}
-      flaggedStatus={flaggedStatus}
-      revealTile={revealTile}
-      flagTile={flagTile}
-    />
+    <>
+      <Minefield
+        gameboard={gameboard}
+        revealStatus={revealStatus}
+        flaggedStatus={flaggedStatus}
+        revealTile={revealTile}
+        flagTile={flagTile}
+      />
+      <div className={styles.rightContainer}>
+        <div className={styles.wordBlockContainer}>
+          {getChatArray.map((chatEntry, index) => (
+            <ChatEntry chat={chatEntry} key={index} />
+          ))}
+        </div>
+        {/* {!client ? ( */}
+        <EntryField addChatMessage={addChatMessage} />
+        {/* ) : (null)} */}
+      </div>
+    </>
   );
-}
+};
 
 export default Game;

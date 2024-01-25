@@ -3,21 +3,21 @@ import styles from "./index.module.scss";
 import MinefieldTile from "@/app/components/MinefieldTile";
 import { TileContent } from "@/app/types/enums";
 
-interface MinefieldProps {
+type MinefieldProps = {
   gameboard: TileContent[][];
   revealStatus: boolean[][];
   flaggedStatus: boolean[][];
   revealTile: (row: number, col: number) => void;
   flagTile: (row: number, col: number) => void;
-}
+};
 
-function Minefield({
+const Minefield: React.FC<MinefieldProps> = ({
   gameboard,
   revealStatus,
   flaggedStatus,
   revealTile,
   flagTile,
-}: MinefieldProps) {
+}) => {
   return (
     <div
       onContextMenu={(e) => {
@@ -28,6 +28,7 @@ function Minefield({
         <div className={styles.row} key={rowIndex}>
           {row.map((cell, colIndex) => (
             <MinefieldTile
+              key={rowIndex + "-" + colIndex}
               row={rowIndex}
               col={colIndex}
               content={cell}
@@ -41,6 +42,6 @@ function Minefield({
       ))}
     </div>
   );
-}
+};
 
 export default Minefield;

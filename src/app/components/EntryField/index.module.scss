@@ -1,0 +1,19 @@
+.entryContainer {
+  margin-top: 20px;
+  font-size: 30px;
+  display: flex;
+  justify-content: space-between;
+
+  input {
+    margin-right: 5px;
+    font-size: 30px;
+    padding: 5px;
+    border: 1px solid black;
+  }
+
+  button {
+    font-size: 30px;
+    cursor: pointer;
+    padding: 5px;
+  }
+}

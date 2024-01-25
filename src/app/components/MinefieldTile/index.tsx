@@ -2,7 +2,7 @@ import React from "react";
 import styles from "./index.module.scss";
 import { TileContent } from "@/app/types/enums";
 
-interface MinefieldTileProps {
+type MinefieldTileProps = {
   row: number;
   col: number;
   content: TileContent;
@@ -10,9 +10,9 @@ interface MinefieldTileProps {
   isFlagged: boolean;
   revealTile: (row: number, col: number) => void;
   flagTile: (row: number, col: number) => void;
-}
+};
 
-function MinefieldTile({
+const MinefieldTile: React.FC<MinefieldTileProps> = ({
   row,
   col,
   content,
@@ -20,7 +20,7 @@ function MinefieldTile({
   isFlagged,
   revealTile,
   flagTile,
-}: MinefieldTileProps) {
+}) => {
   const displayCol = col + 1;
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -41,7 +41,6 @@ function MinefieldTile({
   const handleRightClick = (e): void => {
     e.preventDefault();
     flagTile(row, col);
-    revealTile(row, col);
   };
 
   return isRevealed ? (
@@ -61,6 +60,6 @@ function MinefieldTile({
       {letters[row] + displayCol}
     </div>
   );
-}
+};
 
 export default MinefieldTile;

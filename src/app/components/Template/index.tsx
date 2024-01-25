@@ -2,10 +2,10 @@ import React from "react";
 import styles from "./index.module.scss";
 import { TileContent } from "@/app/types/enums";
 
-interface TemplateProps {}
+type TemplateProps = {};
 
-function Template({}: TemplateProps) {
+const Template: React.FC<TemplateProps> = ({}) => {
   return <></>;
-}
+};
 
 export default Template;
