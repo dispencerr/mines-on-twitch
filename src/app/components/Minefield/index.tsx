@@ -7,15 +7,15 @@ type MinefieldProps = {
   gameboard: TileContent[][];
   revealStatus: boolean[][];
   flaggedStatus: boolean[][];
-  revealTile: (row: number, col: number) => void;
-  flagTile: (row: number, col: number) => void;
+  checkTile: (row: number, col: number, user?: string) => void;
+  flagTile: (row: number, col: number, user?: string) => void;
 };
 
 const Minefield: React.FC<MinefieldProps> = ({
   gameboard,
   revealStatus,
   flaggedStatus,
-  revealTile,
+  checkTile,
   flagTile,
 }) => {
   return (
@@ -34,7 +34,7 @@ const Minefield: React.FC<MinefieldProps> = ({
               content={cell}
               isRevealed={revealStatus[rowIndex][colIndex]}
               isFlagged={flaggedStatus[rowIndex][colIndex]}
-              revealTile={revealTile}
+              checkTile={checkTile}
               flagTile={flagTile}
             />
           ))}

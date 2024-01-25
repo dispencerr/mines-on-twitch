@@ -237,7 +237,7 @@ const Game: React.FC<GameProps> = ({ client }) => {
             gameboard={gameboard}
             revealStatus={revealStatus}
             flaggedStatus={flaggedStatus}
-            revealTile={revealTile}
+            checkTile={checkTile}
             flagTile={flagTile}
           />
         </div>

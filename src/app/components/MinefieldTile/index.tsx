@@ -8,8 +8,8 @@ type MinefieldTileProps = {
   content: TileContent;
   isRevealed: boolean;
   isFlagged: boolean;
-  revealTile: (row: number, col: number) => void;
-  flagTile: (row: number, col: number) => void;
+  checkTile: (row: number, col: number, user?: string) => void;
+  flagTile: (row: number, col: number, user?: string) => void;
 };
 
 const MinefieldTile: React.FC<MinefieldTileProps> = ({
@@ -18,7 +18,7 @@ const MinefieldTile: React.FC<MinefieldTileProps> = ({
   content,
   isRevealed,
   isFlagged,
-  revealTile,
+  checkTile,
   flagTile,
 }) => {
   const displayCol = col + 1;
@@ -30,7 +30,7 @@ const MinefieldTile: React.FC<MinefieldTileProps> = ({
    * @returns void
    */
   const handleClick = (): void => {
-    revealTile(row, col);
+    checkTile(row, col, "User");
   };
 
   /**
@@ -40,7 +40,7 @@ const MinefieldTile: React.FC<MinefieldTileProps> = ({
    */
   const handleRightClick = (e): void => {
     e.preventDefault();
-    flagTile(row, col);
+    flagTile(row, col, "User");
   };
 
   const getRevealedTileClasses = (): string => {
