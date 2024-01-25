@@ -204,9 +204,7 @@ const Game: React.FC<GameProps> = ({ client }) => {
             <ChatEntry chat={chatEntry} key={index} />
           ))}
         </div>
-        {/* {!client ? ( */}
-        <EntryField addChatMessage={addChatMessage} />
-        {/* ) : (null)} */}
+        {!client ? <EntryField addChatMessage={addChatMessage} /> : null}
       </div>
     </div>
   );
