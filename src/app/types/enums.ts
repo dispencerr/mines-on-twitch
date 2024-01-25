@@ -8,5 +8,5 @@ export enum TileContent {
   Six,
   Seven,
   Eight,
-  Mine
+  Mine,
 }

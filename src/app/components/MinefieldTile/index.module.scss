@@ -1,4 +1,4 @@
-@import '@/app/styles/mixins';
+@import "@/app/styles/mixins";
 
 .tile {
   width: varSize(60);
@@ -19,7 +19,7 @@
   position: relative;
 
   &::after {
-    content: '';
+    content: "";
     display: block;
     position: absolute;
     top: 0;

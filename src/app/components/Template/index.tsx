@@ -1,17 +1,11 @@
 import React from "react";
 import styles from "./index.module.scss";
-import { TileContent } from '@/app/types/enums';
+import { TileContent } from "@/app/types/enums";
 
-interface TemplateProps {
-  
-}
+interface TemplateProps {}
 
-function Template({  }: TemplateProps) {
-
-  return (
-    <>
-    </>
-  );
+function Template({}: TemplateProps) {
+  return <></>;
 }
 
 export default Template;
