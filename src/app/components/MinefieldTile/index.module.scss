@@ -11,6 +11,22 @@
   }
 }
 
+@keyframes mineShake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-3px);
+  }
+  50% {
+    transform: translateX(3px);
+  }
+  75% {
+    transform: translateX(-3px);
+  }
+}
+
 .tile {
   width: varSize(60);
   height: varSize(60);
@@ -117,6 +133,10 @@
 
 .isMine {
   background-color: red;
+
+  .tile__content {
+    animation: mineShake 0.25s ease-in-out;
+  }
 }
 
 .isFlagged {
