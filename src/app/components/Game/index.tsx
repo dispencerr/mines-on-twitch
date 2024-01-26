@@ -17,10 +17,12 @@ const MINESWEEPER_GUESS_REGEX = /^([a-hA-H])([1-8])(f|F)?$/i;
 const BOARD_RESET_TIMEOUT = 2000; // Delay before resetting the board after it is fully revealed (ms)
 const USER_TIMEOUT_LENGTH = 2000; // Timeout length before a user can make another guess (ms)
 
-const CORRECT_CHECK_SCORE = 1; // Score change for checking a safe tile
-const INCORRECT_CHECK_SCORE = -6; // Score change for setting off a mine
-const CORRECT_FLAG_SCORE = 2; // Score change for correctly flagging a mine
-const INCORRECT_FLAG_SCORE = -2; // Score change for incorrectly flagging a safe tile
+const SCORES = {
+  CORRECT_CHECK_SCORE: 1, // Score change for checking a safe tile
+  INCORRECT_CHECK_SCORE: -6, // Score change for setting off a mine
+  CORRECT_FLAG_SCORE: 2, // Score change for correctly flagging a mine
+  INCORRECT_FLAG_SCORE: -2, // Score change for incorrectly flagging a safe tile
+} as const;
 
 const Game: React.FC<GameProps> = ({ client }) => {
   const boardSize = 8; // Game Board size
@@ -88,9 +90,9 @@ const Game: React.FC<GameProps> = ({ client }) => {
     // Update score based on if it's a bomb
     if (user) {
       if (gameboard[row][col] === TileContent.Mine) {
-        updateScores(user, INCORRECT_CHECK_SCORE);
+        updateScores(user, SCORES.INCORRECT_CHECK_SCORE);
       } else {
-        updateScores(user, CORRECT_CHECK_SCORE);
+        updateScores(user, SCORES.CORRECT_CHECK_SCORE);
       }
     }
 
@@ -106,9 +108,9 @@ const Game: React.FC<GameProps> = ({ client }) => {
     // Update score based on if it's a bomb
     if (user) {
       if (gameboard[row][col] === TileContent.Mine) {
-        updateScores(user, CORRECT_FLAG_SCORE);
+        updateScores(user, SCORES.CORRECT_FLAG_SCORE);
       } else {
-        updateScores(user, INCORRECT_FLAG_SCORE);
+        updateScores(user, SCORES.INCORRECT_FLAG_SCORE);
       }
     }
 
@@ -285,9 +287,10 @@ const Game: React.FC<GameProps> = ({ client }) => {
         <p className={styles.howToPlay__text}>
           The number on a tile indicates how many of the surrounding tiles
           (including diagonals) are mines. Gain points by opening safe tiles (+
-          {CORRECT_CHECK_SCORE}) and flagging mines (+{CORRECT_FLAG_SCORE}).
-          Lose points if you open a mine ({INCORRECT_CHECK_SCORE}) or flag a
-          safe tile ({INCORRECT_FLAG_SCORE}).
+          {SCORES.CORRECT_CHECK_SCORE}) and flagging mines (+
+          {SCORES.CORRECT_FLAG_SCORE}). Lose points if you open a mine (
+          {SCORES.INCORRECT_CHECK_SCORE}) or flag a safe tile (
+          {SCORES.INCORRECT_FLAG_SCORE}).
         </p>
       </div>
     </>
