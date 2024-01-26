@@ -1,7 +1,8 @@
 export type Chat = {
   message: string;
-  user: string | undefined;
-  color: string | undefined;
+  user: string;
+  color: string;
+  isMod: boolean;
 };
 
 export type RGBColor = [number, number, number];

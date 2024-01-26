@@ -2,14 +2,12 @@ import { Scores } from "@/app/types/types";
 import styles from "./index.module.scss";
 
 type ScoreboardProps = {
-  getUserScores: Scores;
+  userScores: Scores;
 };
 
-const Scoreboard: React.FC<ScoreboardProps> = ({ getUserScores }) => {
+const Scoreboard: React.FC<ScoreboardProps> = ({ userScores }) => {
   // Sort data by score in descending order
-  const sortedScores = Object.entries(getUserScores).sort(
-    (a, b) => b[1] - a[1]
-  );
+  const sortedScores = Object.entries(userScores).sort((a, b) => b[1] - a[1]);
 
   return (
     <div>

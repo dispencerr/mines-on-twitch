@@ -27,6 +27,7 @@ const EntryField: React.FC<EntryFieldProps> = ({ handleChatEntry }) => {
       user: "User",
       message: getEntry,
       color: "#FFFFFF",
+      isMod: true,
     };
     handleChatEntry(newChat);
   };

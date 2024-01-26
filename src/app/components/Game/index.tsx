@@ -13,9 +13,10 @@ type GameProps = {
   client: Client | null;
 };
 
-const MINESWEEPER_GUESS_REGEX = /^([a-hA-H])([1-8])(f|F)?$/i;
+const MINESWEEPER_GUESS_REGEX = /^([a-zA-Z])([0-2]?[0-9])(f|F)?$/i;
 const BOARD_RESET_TIMEOUT = 2000; // Delay before resetting the board after it is fully revealed (ms)
 const USER_TIMEOUT_LENGTH = 2000; // Timeout length before a user can make another guess (ms)
+const DEFAULT_MINE_RATIO = 0.15625;
 
 const SCORES = {
   CORRECT_CHECK_SCORE: 1, // Score change for checking a safe tile
@@ -24,16 +25,25 @@ const SCORES = {
   INCORRECT_FLAG_SCORE: -2, // Score change for incorrectly flagging a safe tile
 } as const;
 
+const COMMANDS = {
+  CHANGE_BOARD_SIZE: "!size", // Command to change the board size
+  CHANGE_NUMBER_OF_MINES: "!mines", // Command to change the number of mines
+} as const;
+
+const COMMANDS_REGEX = `^(${COMMANDS.CHANGE_BOARD_SIZE}|${COMMANDS.CHANGE_NUMBER_OF_MINES})\\s(\\d+)$`;
+
 const Game: React.FC<GameProps> = ({ client }) => {
-  const boardSize = 8; // Game Board size
-  const numOfMines = 10; // Number of mines
+  const [boardSize, setBoardSize] = useState<number>(8); // Game Board size (width)
+  const [numberOfMines, setNumberOfMines] = useState<number>(
+    boardSize ** 2 * DEFAULT_MINE_RATIO
+  ); // Number of mines
   const [gameboard, setGameboard] = useState<TileContent[][]>([]); // 2D array of every tile's content
   const [revealStatus, setRevealStatus] = useState<boolean[][]>([]); // 2D array of booleans indicating if the tile is revealed
   const [flaggedStatus, setFlaggedStatus] = useState<boolean[][]>([]); // 2D array of booleans indicating if the tile is flagged
-  const [getChatArray, setChatArray] = useState<Chat[]>([]); // The displayed chatbox (only of valid guesses)
-  const [getChatMessages, setChatMessages] = useState<Chat[]>([]); // Array of all chats (not displayed)
-  const [getTimeoutStatus, setTimeoutStatus] = useState<TimeoutStatus>({}); // Object keeping track of users' timeout status
-  const [getUserScores, setUserScores] = useState<Scores>({}); // Object keeping track of users' scores
+  const [chatArray, setChatArray] = useState<Chat[]>([]); // The displayed chatbox (only of valid guesses)
+  const [chatMessages, setChatMessages] = useState<Chat[]>([]); // Array of all chats (not displayed)
+  const [timeoutStatus, setTimeoutStatus] = useState<TimeoutStatus>({}); // Object keeping track of users' timeout status
+  const [userScores, setUserScores] = useState<Scores>({}); // Object keeping track of users' scores
 
   const isValidTile = (row: number, col: number): boolean => {
     return row >= 0 && col >= 0 && row < boardSize && col < boardSize;
@@ -141,7 +151,7 @@ const Game: React.FC<GameProps> = ({ client }) => {
     };
 
     // Add mines
-    for (let i = 0; i < numOfMines; i++) {
+    for (let i = 0; i < numberOfMines; i++) {
       let randomRowIndex, randomColIndex;
       do {
         randomRowIndex = Math.floor(Math.random() * size);
@@ -164,7 +174,6 @@ const Game: React.FC<GameProps> = ({ client }) => {
 
   // Function called when a new tile is guessed
   const handleChatEntry = (newChat: Chat) => {
-    if (newChat.user && getTimeoutStatus[newChat.user]) return; // If user is timed out do nothing
     let userGuess = newChat.message.trim(); //twitch adds white space to allow the broadcaster to repeat the same chat repeatedly it seems
 
     // Convert the letter to a number (0-indexed)
@@ -178,6 +187,7 @@ const Game: React.FC<GameProps> = ({ client }) => {
     // console.log(letter, numberStr, flag);
 
     if (letter && numberStr) {
+      if (newChat.user && timeoutStatus[newChat.user]) return; // If user is timed out do nothing
       // console.log("Valid guess");
       const row = letterToNumber(letter); // Convert the number to 0-indexed number
       const col = parseInt(numberStr) - 1; // Convert the number to 0-indexed
@@ -193,10 +203,32 @@ const Game: React.FC<GameProps> = ({ client }) => {
         }
       }
     }
+    // Check if it's a mod command
+    else if (newChat.isMod) {
+      const [, command, numberString] = userGuess.match(COMMANDS_REGEX) || [];
+      console.log(newChat, command, numberString, COMMANDS_REGEX);
+      if (command && numberString) {
+        const number = parseInt(numberString);
+        switch (command) {
+          case COMMANDS.CHANGE_BOARD_SIZE:
+            if (1 < number && number <= 26) {
+              setBoardSize(number);
+            }
+            break;
+          case COMMANDS.CHANGE_NUMBER_OF_MINES:
+            if (0 < number && number < boardSize ** 2) {
+              setNumberOfMines(number);
+            }
+            break;
+          default:
+            break;
+        }
+      }
+    }
   };
 
   const updateScores = (user: string, scoreChange: number) => {
-    let currentScore = getUserScores[user] || 0;
+    let currentScore = userScores[user] || 0;
     let newScore = currentScore + scoreChange;
     // console.log(user + "'s new score: " + newScore);
     setUserScores((prevScores) => ({
@@ -225,28 +257,46 @@ const Game: React.FC<GameProps> = ({ client }) => {
       client.on("message", (channel, tags, message, self) => {
         const newChat: Chat = {
           message: message,
-          user: tags["display-name"],
-          color: tags["color"],
+          user: tags["display-name"] || "User",
+          color: tags["color"] || "#FFFFFF",
+          isMod: tags.mod === true || tags.badges?.broadcaster === "1",
         };
         setChatMessages((prevChatMessages) => [...prevChatMessages, newChat]);
       });
     }
-
-    initializeBoard(boardSize);
   }, []);
 
+  // When a mod changes the board size, automatically set the number of mines to a ratio of the squared board size
   useEffect(() => {
-    if (getChatMessages.length) {
-      let latestChat = getChatMessages[getChatMessages.length - 1];
+    const newNumberOfMines = Math.max(
+      1,
+      Math.floor(boardSize ** 2 * DEFAULT_MINE_RATIO)
+    );
+    if (newNumberOfMines === numberOfMines) {
+      initializeBoard(boardSize);
+    } else {
+      setNumberOfMines(newNumberOfMines);
+    }
+  }, [boardSize]);
+
+  useEffect(() => {
+    setChatArray([]);
+    setChatMessages([]);
+    initializeBoard(boardSize);
+  }, [numberOfMines]);
+
+  useEffect(() => {
+    if (chatMessages.length) {
+      let latestChat = chatMessages[chatMessages.length - 1];
       handleChatEntry(latestChat);
     }
-  }, [getChatMessages]);
+  }, [chatMessages]);
 
   return (
     <>
       <div className={styles.game}>
         <div className={styles.leftContainer}>
-          <Scoreboard getUserScores={getUserScores} />
+          <Scoreboard userScores={userScores} />
         </div>
         <div className={styles.middleContainer}>
           <div className={styles.header}>
@@ -265,7 +315,7 @@ const Game: React.FC<GameProps> = ({ client }) => {
         </div>
         <div className={styles.rightContainer}>
           <div className={styles.chatboxContainer}>
-            {getChatArray.map((chatEntry, index) => (
+            {chatArray.map((chatEntry, index) => (
               <ChatEntry
                 chat={chatEntry}
                 timeoutLength={USER_TIMEOUT_LENGTH}
