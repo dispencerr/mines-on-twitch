@@ -4,8 +4,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 6rem;
+  padding: varSize(40) varSize(50);
   background-color: #18181b;
-  color: white;
+  color: #eeeeee;
   min-height: 100vh;
+}
+
+.link {
+  margin-top: varSize(30);
+  text-decoration: underline;
 }

@@ -11,11 +11,30 @@
 }
 
 .middleContainer {
-  width: varSize(472);
+  width: varSize(672);
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
+}
+
+.header {
+  height: 40%;
+  text-align: center;
+  opacity: 0.5;
+  margin-top: varSize(-15);
+  margin-bottom: varSize(35);
+
+  &__h1 {
+    font-weight: 800;
+    font-size: varSize(72);
+  }
+
+  &__h2 {
+    opacity: 0.4;
+    font-weight: normal;
+    font-size: varSize(36);
+  }
 }
 
 .rightContainer {
@@ -38,9 +57,9 @@
 }
 
 .howToPlay {
-  margin-top: varSize(50);
-  width: varSize(768);
-  color: #aaa;
+  margin-top: varSize(35);
+  width: varSize(1000);
+  opacity: 0.5;
 
   &__head {
     font-weight: bold;

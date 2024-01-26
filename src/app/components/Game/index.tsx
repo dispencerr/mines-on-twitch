@@ -226,8 +226,7 @@ const Game: React.FC<GameProps> = ({ client }) => {
           user: tags["display-name"],
           color: tags["color"],
         };
-        handleChatEntry(newChat);
-        // setChatMessages((prevChatMessages) => [...prevChatMessages, newChat]);
+        setChatMessages((prevChatMessages) => [...prevChatMessages, newChat]);
       });
     }
 
@@ -248,6 +247,12 @@ const Game: React.FC<GameProps> = ({ client }) => {
           <Scoreboard getUserScores={getUserScores} />
         </div>
         <div className={styles.middleContainer}>
+          <div className={styles.header}>
+            <h1 className={styles.header__h1}>Mines on Twitch</h1>
+            <h2 className={styles.header__h2}>
+              https://mines-on-twitch.vercel.app/
+            </h2>
+          </div>
           <Minefield
             gameboard={gameboard}
             revealStatus={revealStatus}
@@ -272,10 +277,10 @@ const Game: React.FC<GameProps> = ({ client }) => {
       <div className={styles.howToPlay}>
         <h3 className={styles.howToPlay__head}>How to Play:</h3>
         <p className={styles.howToPlay__text}>
-          "A3": Open tile A3 {!client && "(or left click)"}
+          A3 : Open tile A3 {!client && "(or left click)"}
         </p>
         <p className={styles.howToPlay__text}>
-          "B6f": Flag tile B6 {!client && "(or right click)"}
+          B6f : Flag tile B6 {!client && "(or right click)"}
         </p>
         <p className={styles.howToPlay__text}>
           The number on a tile indicates how many of the surrounding tiles

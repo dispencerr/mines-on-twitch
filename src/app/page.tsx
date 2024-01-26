@@ -79,12 +79,12 @@ export default function Home() {
                 changeChannel={changeChannel}
                 playOffline={playOffline}
               />
-              {/* <a
+              <a
                 className={styles.link}
-                href="https://github.com/dispencerr/wordle-on-twitch"
+                href="https://github.com/dispencerr/mines-on-twitch"
               >
                 Contribute on GitHub
-              </a> */}
+              </a>
             </>
           ) : (
             <span>Loading...</span>

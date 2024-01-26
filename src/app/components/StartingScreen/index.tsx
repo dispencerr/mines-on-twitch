@@ -31,6 +31,7 @@ const StartingScreen: React.FC<StartingScreenProps> = ({
 
   return (
     <>
+      <h1 className={styles.title}>Mines on Twitch 🚩</h1>
       <div className={styles.channelInput}>
         <span className={styles.text}>Insert Twitch Channel: </span>
         <input

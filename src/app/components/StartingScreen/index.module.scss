@@ -1,7 +1,13 @@
 @import "@/app/styles/mixins";
 
+.title {
+  padding-top: varSize(50);
+  font-size: varSize(60);
+  font-weight: 800;
+}
+
 .channelInput {
-  padding-top: varSize(150);
+  padding-top: varSize(50);
   margin-top: varSize(20);
   font-size: varSize(30);
   display: flex;
