@@ -4,11 +4,10 @@ import "@/app/styles/globals.css";
 import styles from "./page.module.scss";
 import Game from "@/app/components/Game";
 import StartingScreen from "@/app/components/StartingScreen";
-import { TmiClient } from "./types/types";
 import { Client } from "tmi.js";
 
 export default function Home() {
-  const [getClient, setClient] = useState<TmiClient | null>(null);
+  const [getClient, setClient] = useState<Client | null>(null);
   const [getChannel, setChannel] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isConnecting, setIsConnecting] = useState(false);
@@ -30,7 +29,7 @@ export default function Home() {
       let connectionTries = 0;
 
       const checkConnection = () => {
-        if (getClient.channels.length > 0) {
+        if (getClient.getChannels().length > 0) {
           setIsConnected(true);
           clearInterval(tryConnection);
           //update router?
@@ -53,7 +52,7 @@ export default function Home() {
       let client: Client = new tmi.Client({
         channels: [getChannel],
       });
-      setClient(client as unknown as TmiClient);
+      setClient(client);
       client.connect();
     }
   }, [getChannel]);

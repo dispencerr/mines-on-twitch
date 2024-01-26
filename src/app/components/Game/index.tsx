@@ -10,7 +10,7 @@ import EntryField from "@/app/components/EntryField";
 import { Client } from "tmi.js";
 
 type GameProps = {
-  client: Client;
+  client: Client | null;
 };
 
 const MINESWEEPER_GUESS_REGEX = /^([a-hA-H])([1-8])(f|F)?$/i;
@@ -25,14 +25,13 @@ const INCORRECT_FLAG_SCORE = -2; // Score change for incorrectly flagging a safe
 const Game: React.FC<GameProps> = ({ client }) => {
   const boardSize = 8; // Game Board size
   const numOfMines = 10; // Number of mines
-  const [gameboard, setGameboard] = useState<TileContent[][]>([]);
-  const [revealStatus, setRevealStatus] = useState<boolean[][]>([]);
-  const [flaggedStatus, setFlaggedStatus] = useState<boolean[][]>([]);
+  const [gameboard, setGameboard] = useState<TileContent[][]>([]); // 2D array of every tile's content
+  const [revealStatus, setRevealStatus] = useState<boolean[][]>([]); // 2D array of booleans indicating if the tile is revealed
+  const [flaggedStatus, setFlaggedStatus] = useState<boolean[][]>([]); // 2D array of booleans indicating if the tile is flagged
   const [getChatArray, setChatArray] = useState<Chat[]>([]); // The displayed chatbox (only of valid guesses)
   const [getChatMessages, setChatMessages] = useState<Chat[]>([]); // Array of all chats (not displayed)
   const [getTimeoutStatus, setTimeoutStatus] = useState<TimeoutStatus>({}); // Object keeping track of users' timeout status
-  const [getUserScores, setUserScores] = useState<Scores>({});
-  const prevDependencyRef = useRef<Chat[]>();
+  const [getUserScores, setUserScores] = useState<Scores>({}); // Object keeping track of users' scores
 
   if (client) {
     client.on("message", (channel, tags, message, self) => {
@@ -41,7 +40,7 @@ const Game: React.FC<GameProps> = ({ client }) => {
         user: tags["display-name"],
         color: tags["color"],
       };
-      addChatMessage(newChat);
+      setChatMessages((prevChatMessages) => [...prevChatMessages, newChat]);
     });
   }
 
@@ -205,10 +204,6 @@ const Game: React.FC<GameProps> = ({ client }) => {
     }
   };
 
-  const addChatMessage = (newChat: Chat): void => {
-    setChatMessages((prevChatMessages) => [...prevChatMessages, newChat]);
-  };
-
   const updateScores = (user: string, scoreChange: number) => {
     let currentScore = getUserScores[user] || 0;
     let newScore = currentScore + scoreChange;
@@ -239,11 +234,10 @@ const Game: React.FC<GameProps> = ({ client }) => {
   }, []);
 
   useEffect(() => {
-    if (prevDependencyRef.current !== undefined && getChatMessages.length) {
+    if (getChatMessages.length) {
       let latestChat = getChatMessages[getChatMessages.length - 1];
       handleChatEntry(latestChat);
     }
-    prevDependencyRef.current = getChatMessages;
   }, [getChatMessages]);
 
   return (
@@ -271,7 +265,7 @@ const Game: React.FC<GameProps> = ({ client }) => {
               />
             ))}
           </div>
-          {!client ? <EntryField addChatMessage={addChatMessage} /> : <></>}
+          {!client ? <EntryField handleChatEntry={handleChatEntry} /> : <></>}
         </div>
       </div>
       <div className={styles.howToPlay}>

@@ -3,10 +3,10 @@ import styles from "./index.module.scss";
 import { Chat } from "@/app/types/types";
 
 type EntryFieldProps = {
-  addChatMessage: (newChat: Chat) => void;
+  handleChatEntry: (newChat: Chat) => void;
 };
 
-const EntryField: React.FC<EntryFieldProps> = ({ addChatMessage }) => {
+const EntryField: React.FC<EntryFieldProps> = ({ handleChatEntry }) => {
   const [getEntry, setEntry] = useState("");
   const wordInputRef = useRef<HTMLInputElement | null>(null);
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
@@ -28,7 +28,7 @@ const EntryField: React.FC<EntryFieldProps> = ({ addChatMessage }) => {
       message: getEntry,
       color: "#FFFFFF",
     };
-    addChatMessage(newChat);
+    handleChatEntry(newChat);
   };
 
   return (
