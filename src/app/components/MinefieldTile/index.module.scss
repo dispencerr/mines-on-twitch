@@ -2,21 +2,21 @@
 
 @keyframes flagSpin {
   from {
-    transform: rotate(-180deg);
-    scale: 0;
-    margin-top: 8px;
+    transform: rotate(90deg);
+    opacity: 0;
   }
   to {
     transform: rotate(0deg);
-    scale: 1;
-    margin-top: 0px;
+    opacity: 1;
   }
 }
 
 .tile {
   width: varSize(60);
   height: varSize(60);
-  line-height: varSize(60);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid #111;
   text-align: center;
   font-weight: bold;
@@ -127,7 +127,8 @@
 
     .tile__content {
       display: inline-block;
-      animation: flagSpin 0.5s ease-in;
+      transform-origin: bottom;
+      animation: flagSpin 0.25s ease-in;
     }
   }
 }
