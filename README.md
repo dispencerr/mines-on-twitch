@@ -1,36 +1,15 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Mines on Twitch
 
-## Getting Started
+A Minesweeper-like game that reads Twitch chat for moves and gives points.
 
-First, run the development server:
+For streamers, add <span>https://mines-on-twitch.vercel.app/?channel=*YourChannelName*</span> as a browser source in your streaming application. Recommended size is 1920x1080 and downsize to fit your layout.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Chatters send commands in Twitch chat using the following format (Letters are not case-sensitive):
+A3 : Open tile A3
+B6f : Flag tile B6
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Just like in Minesweeper, the number on a tile indicates how many of the surrounding tiles (including diagonals) are mines. Gain points by opening safe tiles and flagging mines, and lose points if you open a mine or flag a safe tile. Unlike other versions of Minesweeper, mistakenly flagging a safe tile will immediately open it.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+Note that the game is not synchronized across instances, so the only meaningful way to play is for the streamer to load in the game as a browser source or share their screen to play. Giving the URL to people in chat will not show them the same game as the streamer. Naturally, chatters with more latency will have a harder time playing, and the streamer (with no latency) will have an inherit advantage.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+You can also play the game without connecting to Twitch by clicking "Play without Connecting". This version allows clicking tiles to open them and right-clicking tiles to flag them, or you can use the built in chatbox as well.
