@@ -1,5 +1,9 @@
 @import "@/app/styles/mixins";
 
+.blockCont {
+  overflow-y: clip;
+}
+
 .block {
   position: relative;
   display: flex;

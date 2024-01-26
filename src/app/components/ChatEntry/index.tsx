@@ -1,11 +1,15 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import styles from "./index.module.scss";
 import { Chat, RGBColor } from "@/app/types/types";
 import CooldownTimer from "../CooldownTimer";
+import { gsap } from "gsap";
+import { useWhooshSound } from "@/app/util/Sounds";
 
 type ChatEntryProps = { chat: Chat; timeoutLength: number };
 
 const ChatEntry: React.FC<ChatEntryProps> = ({ chat, timeoutLength }) => {
+  const { playWhooshSound } = useWhooshSound();
+  const wordContRef = useRef(null);
   const color = chat.color || "#ffffff";
   const user = chat.user || "User";
   const formattedChat =
@@ -60,8 +64,28 @@ const ChatEntry: React.FC<ChatEntryProps> = ({ chat, timeoutLength }) => {
       .join("")}`;
   };
 
+  const animateWordEntry = () => {
+    let wordCont = wordContRef.current;
+    if (wordCont) {
+      gsap.fromTo(
+        wordCont,
+        { maxHeight: 0 },
+        {
+          maxHeight: 80,
+          ease: "linear",
+          duration: 0.5,
+          onStart: playWhooshSound,
+        }
+      );
+    }
+  };
+
+  useEffect(() => {
+    animateWordEntry();
+  }, []);
+
   return (
-    <div className={styles.blockCont}>
+    <div className={styles.blockCont} ref={wordContRef}>
       <div className={styles.block}>
         <CooldownTimer timeoutLength={timeoutLength} />
         <span className={styles.user} style={{ color: adjustConstrast(color) }}>
