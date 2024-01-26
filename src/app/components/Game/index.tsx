@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import styles from "./index.module.scss";
 import Minefield from "@/app/components/Minefield";
 import { TileContent } from "@/app/types/enums";
@@ -32,17 +32,6 @@ const Game: React.FC<GameProps> = ({ client }) => {
   const [getChatMessages, setChatMessages] = useState<Chat[]>([]); // Array of all chats (not displayed)
   const [getTimeoutStatus, setTimeoutStatus] = useState<TimeoutStatus>({}); // Object keeping track of users' timeout status
   const [getUserScores, setUserScores] = useState<Scores>({}); // Object keeping track of users' scores
-
-  if (client) {
-    client.on("message", (channel, tags, message, self) => {
-      const newChat: Chat = {
-        message: message,
-        user: tags["display-name"],
-        color: tags["color"],
-      };
-      setChatMessages((prevChatMessages) => [...prevChatMessages, newChat]);
-    });
-  }
 
   const isValidTile = (row: number, col: number): boolean => {
     return row >= 0 && col >= 0 && row < boardSize && col < boardSize;
@@ -230,6 +219,18 @@ const Game: React.FC<GameProps> = ({ client }) => {
   };
 
   useEffect(() => {
+    if (client) {
+      client.on("message", (channel, tags, message, self) => {
+        const newChat: Chat = {
+          message: message,
+          user: tags["display-name"],
+          color: tags["color"],
+        };
+        handleChatEntry(newChat);
+        // setChatMessages((prevChatMessages) => [...prevChatMessages, newChat]);
+      });
+    }
+
     initializeBoard(boardSize);
   }, []);
 
@@ -265,16 +266,16 @@ const Game: React.FC<GameProps> = ({ client }) => {
               />
             ))}
           </div>
-          {!client ? <EntryField handleChatEntry={handleChatEntry} /> : <></>}
+          {!client && <EntryField handleChatEntry={handleChatEntry} />}
         </div>
       </div>
       <div className={styles.howToPlay}>
         <h3 className={styles.howToPlay__head}>How to Play:</h3>
         <p className={styles.howToPlay__text}>
-          "A3": Open tile A3 {!client ? "(or left click)" : ""}
+          "A3": Open tile A3 {!client && "(or left click)"}
         </p>
         <p className={styles.howToPlay__text}>
-          "B6f": Flag tile B6 {!client ? "(or right click)" : ""}
+          "B6f": Flag tile B6 {!client && "(or right click)"}
         </p>
         <p className={styles.howToPlay__text}>
           The number on a tile indicates how many of the surrounding tiles
