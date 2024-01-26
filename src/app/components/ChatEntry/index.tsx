@@ -7,6 +7,8 @@ type ChatEntryProps = { chat: Chat };
 const ChatEntry: React.FC<ChatEntryProps> = ({ chat }) => {
   const color = chat.color || "#ffffff";
   const user = chat.user || "User";
+  const formattedChat =
+    chat.message.charAt(0).toUpperCase() + chat.message.slice(1);
 
   const hexToRGB = (hexCode: string): RGBColor => {
     hexCode = hexCode.replace("#", "");
@@ -63,7 +65,7 @@ const ChatEntry: React.FC<ChatEntryProps> = ({ chat }) => {
         <span className={styles.user} style={{ color: adjustConstrast(color) }}>
           {user.length <= 10 ? user : user.slice(0, 7) + "..."}
         </span>
-        <div className={styles.word}>{chat.message}</div>
+        <div className={styles.word}>{formattedChat}</div>
       </div>
     </div>
   );

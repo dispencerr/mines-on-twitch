@@ -256,8 +256,12 @@ const Game: React.FC<GameProps> = ({ client }) => {
       </div>
       <div className={styles.howToPlay}>
         <h3 className={styles.howToPlay__head}>How to Play:</h3>
-        <p className={styles.howToPlay__text}>"A3": Open tile A3</p>
-        <p className={styles.howToPlay__text}>"B6f": Flag tile B6</p>
+        <p className={styles.howToPlay__text}>
+          "A3": Open tile A3 {!client ? "(or left click)" : ""}
+        </p>
+        <p className={styles.howToPlay__text}>
+          "B6f": Flag tile B6 {!client ? "(or right click)" : ""}
+        </p>
         <p className={styles.howToPlay__text}>
           The number on a tile indicates how many of the surrounding tiles
           (including diagonals) are mines. Gain points by opening safe tiles (+
