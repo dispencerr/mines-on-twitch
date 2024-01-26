@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import styles from "./index.module.scss";
 import Minefield from "@/app/components/Minefield";
 import { TileContent } from "@/app/types/enums";
-import { Chat, Scores } from "@/app/types/types";
+import { Chat, Scores, TimeoutStatus } from "@/app/types/types";
 import Scoreboard from "@/app/components/Scoreboard";
 import ChatEntry from "@/app/components/ChatEntry";
 import EntryField from "@/app/components/EntryField";
@@ -15,6 +15,7 @@ type GameProps = {
 
 const MINESWEEPER_GUESS_REGEX = /^([a-hA-H])([1-8])(f|F)?$/i;
 const BOARD_RESET_TIMEOUT = 2000; // Delay before resetting the board after it is fully revealed
+const USER_TIMEOUT_LENGTH = 3000; // Timeout length before a user can make another guess
 
 const CORRECT_CHECK_SCORE = 1; // Score change for checking a safe tile
 const INCORRECT_CHECK_SCORE = -6; // Score change for setting off a mine
@@ -29,6 +30,7 @@ const Game: React.FC<GameProps> = ({ client }) => {
   const [flaggedStatus, setFlaggedStatus] = useState<boolean[][]>([]);
   const [getChatArray, setChatArray] = useState<Chat[]>([]); // The displayed chatbox (only of valid guesses)
   const [getChatMessages, setChatMessages] = useState<Chat[]>([]); // Array of all chats (not displayed)
+  const [getTimeoutStatus, setTimeoutStatus] = useState<TimeoutStatus>({}); // Object keeping track of users' timeout status
   const [getUserScores, setUserScores] = useState<Scores>({});
   const prevDependencyRef = useRef<Chat[]>();
 
@@ -172,6 +174,7 @@ const Game: React.FC<GameProps> = ({ client }) => {
 
   // Function called when a new tile is guessed
   const handleChatEntry = (newChat: Chat) => {
+    if (newChat.user && getTimeoutStatus[newChat.user]) return; // If user is timed out do nothing
     let userGuess = newChat.message.trim(); //twitch adds white space to allow the broadcaster to repeat the same chat repeatedly it seems
 
     // Convert the letter to a number (0-indexed)
@@ -186,7 +189,6 @@ const Game: React.FC<GameProps> = ({ client }) => {
 
     if (letter && numberStr) {
       // console.log("Valid guess");
-      // TODO: Check for timeout
       const row = letterToNumber(letter); // Convert the number to 0-indexed number
       const col = parseInt(numberStr) - 1; // Convert the number to 0-indexed
       if (isValidTile(row, col) && !revealStatus[row][col]) {
@@ -196,6 +198,9 @@ const Game: React.FC<GameProps> = ({ client }) => {
           checkTile(row, col, newChat.user);
         }
         setChatArray((prevChatArray) => [...prevChatArray, newChat]);
+        if (newChat.user) {
+          timeoutUser(newChat.user);
+        }
       }
     }
   };
@@ -212,6 +217,21 @@ const Game: React.FC<GameProps> = ({ client }) => {
       ...prevScores,
       [user]: newScore,
     }));
+  };
+
+  const timeoutUser = (user: string) => {
+    setTimeoutStatus((prevObject) => ({
+      ...prevObject,
+      [user]: true,
+    }));
+    // console.log('Timed out ' + user);
+    setTimeout(function () {
+      setTimeoutStatus((prevObject) => ({
+        ...prevObject,
+        [user]: false,
+      }));
+      // console.log('Untimed out ' + user);
+    }, USER_TIMEOUT_LENGTH);
   };
 
   useEffect(() => {

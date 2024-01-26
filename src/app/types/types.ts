@@ -13,3 +13,7 @@ export type TmiClient = {
 export type Scores = {
   [key: string]: number;
 };
+
+export type TimeoutStatus = {
+  [key: string]: boolean;
+};

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import styles from "./index.module.scss";
 import { Chat, RGBColor } from "@/app/types/types";
+import CooldownTimer from "../CooldownTimer";
 
 type ChatEntryProps = { chat: Chat };
 
@@ -62,6 +63,7 @@ const ChatEntry: React.FC<ChatEntryProps> = ({ chat }) => {
   return (
     <div className={styles.blockCont}>
       <div className={styles.block}>
+        <CooldownTimer />
         <span className={styles.user} style={{ color: adjustConstrast(color) }}>
           {user.length <= 10 ? user : user.slice(0, 7) + "..."}
         </span>
