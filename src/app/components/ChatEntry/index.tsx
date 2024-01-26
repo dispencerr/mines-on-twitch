@@ -3,9 +3,9 @@ import styles from "./index.module.scss";
 import { Chat, RGBColor } from "@/app/types/types";
 import CooldownTimer from "../CooldownTimer";
 
-type ChatEntryProps = { chat: Chat };
+type ChatEntryProps = { chat: Chat; timeoutLength: number };
 
-const ChatEntry: React.FC<ChatEntryProps> = ({ chat }) => {
+const ChatEntry: React.FC<ChatEntryProps> = ({ chat, timeoutLength }) => {
   const color = chat.color || "#ffffff";
   const user = chat.user || "User";
   const formattedChat =
@@ -63,7 +63,7 @@ const ChatEntry: React.FC<ChatEntryProps> = ({ chat }) => {
   return (
     <div className={styles.blockCont}>
       <div className={styles.block}>
-        <CooldownTimer />
+        <CooldownTimer timeoutLength={timeoutLength} />
         <span className={styles.user} style={{ color: adjustConstrast(color) }}>
           {user.length <= 10 ? user : user.slice(0, 7) + "..."}
         </span>

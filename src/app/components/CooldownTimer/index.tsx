@@ -2,8 +2,11 @@ import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import styles from "./index.module.scss";
 
-const CooldownTimer: React.FC = () => {
+type CooldownTimerProps = { timeoutLength: number };
+
+const CooldownTimer: React.FC<CooldownTimerProps> = ({ timeoutLength }) => {
   const timerCircleRef = useRef(null);
+  const timeoutLengthInSeconds = timeoutLength / 1000;
 
   useEffect(() => {
     function startCooldownTimer() {
@@ -14,7 +17,7 @@ const CooldownTimer: React.FC = () => {
       // Animate the timer circle counterclockwise over three seconds
       tl.to(timerCircle, {
         "--p": "100",
-        duration: 3,
+        duration: timeoutLengthInSeconds,
         ease: "linear",
       });
       tl.to(timerCircle, {

@@ -14,8 +14,8 @@ type GameProps = {
 };
 
 const MINESWEEPER_GUESS_REGEX = /^([a-hA-H])([1-8])(f|F)?$/i;
-const BOARD_RESET_TIMEOUT = 2000; // Delay before resetting the board after it is fully revealed
-const USER_TIMEOUT_LENGTH = 3000; // Timeout length before a user can make another guess
+const BOARD_RESET_TIMEOUT = 2000; // Delay before resetting the board after it is fully revealed (ms)
+const USER_TIMEOUT_LENGTH = 2000; // Timeout length before a user can make another guess (ms)
 
 const CORRECT_CHECK_SCORE = 1; // Score change for checking a safe tile
 const INCORRECT_CHECK_SCORE = -6; // Score change for setting off a mine
@@ -262,16 +262,16 @@ const Game: React.FC<GameProps> = ({ client }) => {
           />
         </div>
         <div className={styles.rightContainer}>
-          <div className={styles.wordBlockContainer}>
+          <div className={styles.chatboxContainer}>
             {getChatArray.map((chatEntry, index) => (
-              <ChatEntry chat={chatEntry} key={index} />
+              <ChatEntry
+                chat={chatEntry}
+                timeoutLength={USER_TIMEOUT_LENGTH}
+                key={index}
+              />
             ))}
           </div>
-          {!client ? (
-            <EntryField addChatMessage={addChatMessage} />
-          ) : (
-            <EntryField addChatMessage={addChatMessage} />
-          )}
+          {!client ? <EntryField addChatMessage={addChatMessage} /> : <></>}
         </div>
       </div>
       <div className={styles.howToPlay}>

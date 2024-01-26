@@ -25,15 +25,15 @@
   flex-direction: column;
   align-self: flex-end;
   align-items: center;
+  max-height: varSize(424);
 }
 
-.wordBlockContainer {
+.chatboxContainer {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   align-items: flex-start;
   overflow-y: clip;
-  max-height: varSize(233);
   width: 100%;
 }
 
