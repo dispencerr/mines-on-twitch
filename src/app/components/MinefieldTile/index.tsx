@@ -90,7 +90,9 @@ const MinefieldTile: React.FC<MinefieldTileProps> = ({
 
   return isRevealed ? (
     <div className={getRevealedTileClasses()}>
-      {content === TileContent.Mine ? (isFlagged ? "🚩" : "💣") : content}
+      <span className={styles.tile__content}>
+        {content === TileContent.Mine ? (isFlagged ? "🚩" : "💣") : content}
+      </span>
     </div>
   ) : (
     <div
