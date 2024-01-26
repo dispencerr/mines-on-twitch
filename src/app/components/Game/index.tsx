@@ -44,6 +44,7 @@ const Game: React.FC<GameProps> = ({ client }) => {
   const [chatMessages, setChatMessages] = useState<Chat[]>([]); // Array of all chats (not displayed)
   const [timeoutStatus, setTimeoutStatus] = useState<TimeoutStatus>({}); // Object keeping track of users' timeout status
   const [userScores, setUserScores] = useState<Scores>({}); // Object keeping track of users' scores
+  let chatCount = 0;
 
   const isValidTile = (row: number, col: number): boolean => {
     return row >= 0 && col >= 0 && row < boardSize && col < boardSize;
@@ -315,11 +316,11 @@ const Game: React.FC<GameProps> = ({ client }) => {
         </div>
         <div className={styles.rightContainer}>
           <div className={styles.chatboxContainer}>
-            {chatArray.map((chatEntry, index) => (
+            {chatArray.map((chatEntry) => (
               <ChatEntry
                 chat={chatEntry}
                 timeoutLength={USER_TIMEOUT_LENGTH}
-                key={index}
+                key={chatCount++}
               />
             ))}
           </div>
