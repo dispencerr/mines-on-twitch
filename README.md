@@ -13,3 +13,11 @@ Just like in Minesweeper, the number on a tile indicates how many of the surroun
 Note that the game is not synchronized across instances, so the only meaningful way to play is for the streamer to load in the game as a browser source or share their screen to play. Giving the URL to people in chat will not show them the same game as the streamer. Naturally, chatters with more latency will have a harder time playing, and the streamer (with no latency) will have an inherit advantage.
 
 You can also play the game without connecting to Twitch by clicking "Play without Connecting". This version allows clicking tiles to open them and right-clicking tiles to flag them, or you can use the built in chatbox as well.
+
+## Credits
+
+Sound Effects:
+
+[Whoosh](https://freesound.org/people/DJT4NN3R/sounds/449992/)
+
+[Point change](https://freesound.org/people/plasterbrain/sounds/608431/)
