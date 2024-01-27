@@ -35,7 +35,7 @@ const SOUNDS = {
   chimeSound: { file: '/sounds/chime.wav', volume: 0.5 },
   flagSound: { file: '/sounds/flag.wav', volume: 0.3 },
   incorrectSound: { file: '/sounds/incorrect.wav', volume: 0.3 },
-  newGameSound: { file: '/sounds/newGame.wav', volume: 0.5 },
+  newGameSound: { file: '/sounds/newgame.wav', volume: 0.5 },
 } as const;
 
 const COMMANDS_REGEX = `^(${COMMANDS.CHANGE_BOARD_SIZE}|${COMMANDS.CHANGE_NUMBER_OF_MINES})\\s(\\d+)$`;
