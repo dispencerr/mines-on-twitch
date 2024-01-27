@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import "@/app/styles/globals.css";
 import styles from "./page.module.scss";
 import Game from "@/app/components/Game";
@@ -7,6 +8,8 @@ import StartingScreen from "@/app/components/StartingScreen";
 import { Client } from "tmi.js";
 
 export default function Home() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [getClient, setClient] = useState<Client | null>(null);
   const [getChannel, setChannel] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -32,7 +35,9 @@ export default function Home() {
         if (getClient.getChannels().length > 0) {
           setIsConnected(true);
           clearInterval(tryConnection);
-          //update router?
+          const params = new URLSearchParams(searchParams.toString())
+          params.set('channel', getClient.getChannels()[0].slice(1))
+          window.history.pushState(null, '', `?${params.toString()}`)
         } else if (connectionTries >= 5) {
           clearInterval(tryConnection);
           alert("Connection failed");
