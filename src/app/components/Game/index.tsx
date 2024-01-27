@@ -159,6 +159,8 @@ const Game: React.FC<GameProps> = ({ client }) => {
   };
 
   const initializeBoard = (size: number): void => {
+    setChatArray([]);
+    setChatMessages([]);
     setGameboard([]);
     let newBoard = Array.from({ length: size }, () =>
       Array(size).fill(TileContent.Zero)
@@ -313,8 +315,6 @@ const Game: React.FC<GameProps> = ({ client }) => {
   }, [boardSize]);
 
   useEffect(() => {
-    setChatArray([]);
-    setChatMessages([]);
     initializeBoard(boardSize);
   }, [numberOfMines]);
 
