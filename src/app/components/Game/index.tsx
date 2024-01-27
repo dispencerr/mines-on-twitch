@@ -57,6 +57,7 @@ const Game: React.FC<GameProps> = ({ client }) => {
 
   const playSound = (soundObject: Sound): void => {
     const soundFile = new Audio(soundObject.file);
+    soundFile.volume = soundObject.volume;
     soundFile.play();
   }
 
