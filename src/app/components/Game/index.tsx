@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import styles from "./index.module.scss";
 import Minefield from "@/app/components/Minefield";
 import { TileContent } from "@/app/types/enums";
-import { Chat, Scores, TimeoutStatus } from "@/app/types/types";
+import { Chat, Scores, TimeoutStatus, Sound } from "@/app/types/types";
 import Scoreboard from "@/app/components/Scoreboard";
 import ChatEntry from "@/app/components/ChatEntry";
 import EntryField from "@/app/components/EntryField";
@@ -30,6 +30,14 @@ const COMMANDS = {
   CHANGE_NUMBER_OF_MINES: "!mines", // Command to change the number of mines
 } as const;
 
+const SOUNDS = {
+  explosionSound: { file: '/sounds/explosion.wav', volume: 0.5 },
+  chimeSound: { file: '/sounds/chime.wav', volume: 0.5 },
+  flagSound: { file: '/sounds/flag.wav', volume: 0.3 },
+  incorrectSound: { file: '/sounds/incorrect.wav', volume: 0.3 },
+  newGameSound: { file: '/sounds/newGame.wav', volume: 0.5 },
+} as const;
+
 const COMMANDS_REGEX = `^(${COMMANDS.CHANGE_BOARD_SIZE}|${COMMANDS.CHANGE_NUMBER_OF_MINES})\\s(\\d+)$`;
 
 
@@ -47,21 +55,10 @@ const Game: React.FC<GameProps> = ({ client }) => {
   const [userScores, setUserScores] = useState<Scores>({}); // Object keeping track of users' scores
   const isConnected = client !== null;
 
-  const explosionSound = new Audio('/sounds/explosion.wav');
-  const chimeSound = new Audio('/sounds/chime.wav');
-  const flagSound = new Audio('/sounds/flag.wav');
-  const incorrectSound = new Audio('/sounds/incorrect.wav');
-  const newGameSound = new Audio('/sounds/newGame.wav');
-  explosionSound.preload = 'auto';
-  chimeSound.preload = 'auto';
-  flagSound.preload = 'auto';
-  incorrectSound.preload = 'auto';
-  newGameSound.preload = 'auto';
-  explosionSound.volume = 0.5;
-  chimeSound.volume = 0.5;
-  flagSound.volume = 0.3;
-  incorrectSound.volume = 0.3;
-  newGameSound.volume = 0.5;
+  const playSound = (soundObject: Sound): void => {
+    const soundFile = new Audio(soundObject.file);
+    soundFile.play();
+  }
 
   let chatCount = 0;
 
@@ -120,10 +117,10 @@ const Game: React.FC<GameProps> = ({ client }) => {
     // Update score based on if it's a bomb
     if (user) {
       if (gameboard[row][col] === TileContent.Mine) {
-        explosionSound.play();
+        playSound(SOUNDS.explosionSound)
         updateScores(user, SCORES.INCORRECT_CHECK_SCORE);
       } else {
-        chimeSound.play();
+        playSound(SOUNDS.chimeSound)
         updateScores(user, SCORES.CORRECT_CHECK_SCORE);
       }
     }
@@ -140,10 +137,10 @@ const Game: React.FC<GameProps> = ({ client }) => {
     // Update score based on if it's a bomb
     if (user) {
       if (gameboard[row][col] === TileContent.Mine) {
-        flagSound.play();
+        playSound(SOUNDS.flagSound)
         updateScores(user, SCORES.CORRECT_FLAG_SCORE);
       } else {
-        incorrectSound.play();
+        playSound(SOUNDS.incorrectSound)
         updateScores(user, SCORES.INCORRECT_FLAG_SCORE);
       }
     }
@@ -192,7 +189,9 @@ const Game: React.FC<GameProps> = ({ client }) => {
         }
       }
     }
-    if (gameboard.length) { newGameSound.play(); }
+    if (gameboard.length) {
+      playSound(SOUNDS.newGameSound)
+    }
     setGameboard([...newBoard]);
   };
 

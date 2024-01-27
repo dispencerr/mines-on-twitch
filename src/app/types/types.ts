@@ -14,3 +14,8 @@ export type Scores = {
 export type TimeoutStatus = {
   [key: string]: boolean;
 };
+
+export type Sound = {
+  file: string;
+  volume: number;
+};
