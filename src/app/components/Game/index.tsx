@@ -44,6 +44,7 @@ const Game: React.FC<GameProps> = ({ client }) => {
   const [chatMessages, setChatMessages] = useState<Chat[]>([]); // Array of all chats (not displayed)
   const [timeoutStatus, setTimeoutStatus] = useState<TimeoutStatus>({}); // Object keeping track of users' timeout status
   const [userScores, setUserScores] = useState<Scores>({}); // Object keeping track of users' scores
+  const isConnected = client !== null;
   let chatCount = 0;
 
   const isValidTile = (row: number, col: number): boolean => {
@@ -254,7 +255,7 @@ const Game: React.FC<GameProps> = ({ client }) => {
   };
 
   useEffect(() => {
-    if (client) {
+    if (isConnected) {
       client.on("message", (channel, tags, message, self) => {
         const newChat: Chat = {
           message: message,
@@ -312,6 +313,7 @@ const Game: React.FC<GameProps> = ({ client }) => {
             flaggedStatus={flaggedStatus}
             checkTile={checkTile}
             flagTile={flagTile}
+            isConnected={isConnected}
           />
         </div>
         <div className={styles.rightContainer}>
@@ -324,16 +326,16 @@ const Game: React.FC<GameProps> = ({ client }) => {
               />
             ))}
           </div>
-          {!client && <EntryField handleChatEntry={handleChatEntry} />}
+          {!isConnected && <EntryField handleChatEntry={handleChatEntry} />}
         </div>
       </div>
       <div className={styles.howToPlay}>
         <h3 className={styles.howToPlay__head}>How to Play:</h3>
         <p className={styles.howToPlay__text}>
-          A3 : Open tile A3 {!client && "(or left click)"}
+          A3 : Open tile A3 {!isConnected && "(or left click)"}
         </p>
         <p className={styles.howToPlay__text}>
-          B6f : Flag tile B6 {!client && "(or right click)"}
+          B6f : Flag tile B6 {!isConnected && "(or right click)"}
         </p>
         <p className={styles.howToPlay__text}>
           The number on a tile indicates how many of the surrounding tiles

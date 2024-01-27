@@ -9,6 +9,7 @@ type MinefieldProps = {
   flaggedStatus: boolean[][];
   checkTile: (row: number, col: number, user?: string) => void;
   flagTile: (row: number, col: number, user?: string) => void;
+  isConnected: boolean;
 };
 
 const Minefield: React.FC<MinefieldProps> = ({
@@ -17,6 +18,7 @@ const Minefield: React.FC<MinefieldProps> = ({
   flaggedStatus,
   checkTile,
   flagTile,
+  isConnected
 }) => {
   return (
     <div
@@ -36,6 +38,7 @@ const Minefield: React.FC<MinefieldProps> = ({
               isFlagged={flaggedStatus[rowIndex][colIndex]}
               checkTile={checkTile}
               flagTile={flagTile}
+              isConnected={isConnected}
             />
           ))}
         </div>

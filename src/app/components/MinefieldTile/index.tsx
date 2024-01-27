@@ -10,6 +10,7 @@ type MinefieldTileProps = {
   isFlagged: boolean;
   checkTile: (row: number, col: number, user?: string) => void;
   flagTile: (row: number, col: number, user?: string) => void;
+  isConnected: boolean;
 };
 
 const MinefieldTile: React.FC<MinefieldTileProps> = ({
@@ -20,6 +21,7 @@ const MinefieldTile: React.FC<MinefieldTileProps> = ({
   isFlagged,
   checkTile,
   flagTile,
+  isConnected
 }) => {
   const displayCol = col + 1;
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -96,9 +98,9 @@ const MinefieldTile: React.FC<MinefieldTileProps> = ({
     </div>
   ) : (
     <div
-      className={`${styles.tile} ${styles.unrevealedTile}`}
-      onClick={handleClick}
-      onContextMenu={handleRightClick}
+      className={`${styles.tile} ${styles.unrevealedTile} ${!isConnected ? '' : styles.clickDisabled}`}
+      onClick={!isConnected ? handleClick : undefined}
+      onContextMenu={!isConnected ? handleRightClick : undefined}
     >
       {letters[row] + displayCol}
     </div>
