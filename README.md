@@ -30,4 +30,8 @@ You can also play the game without connecting to Twitch by clicking "Play withou
 
 Sound Effects:
 
-[Whoosh](https://freesound.org/people/DJT4NN3R/sounds/449992/)
+[Open Chime](https://freesound.org/people/Eponn/sounds/619835/)
+[Flag Chime](https://freesound.org/people/Eponn/sounds/636659/)
+[Mine Sound](https://freesound.org/people/newagesoup/sounds/347311/)
+[Incorrect Flag Sound](https://freesound.org/people/Eponn/sounds/636642/)
+[New Game](https://freesound.org/people/Eponn/sounds/636628/)

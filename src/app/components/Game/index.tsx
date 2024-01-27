@@ -32,6 +32,7 @@ const COMMANDS = {
 
 const COMMANDS_REGEX = `^(${COMMANDS.CHANGE_BOARD_SIZE}|${COMMANDS.CHANGE_NUMBER_OF_MINES})\\s(\\d+)$`;
 
+
 const Game: React.FC<GameProps> = ({ client }) => {
   const [boardSize, setBoardSize] = useState<number>(8); // Game Board size (width)
   const [numberOfMines, setNumberOfMines] = useState<number>(
@@ -45,6 +46,23 @@ const Game: React.FC<GameProps> = ({ client }) => {
   const [timeoutStatus, setTimeoutStatus] = useState<TimeoutStatus>({}); // Object keeping track of users' timeout status
   const [userScores, setUserScores] = useState<Scores>({}); // Object keeping track of users' scores
   const isConnected = client !== null;
+
+  const explosionSound = new Audio('/sounds/explosion.wav');
+  const chimeSound = new Audio('/sounds/chime.wav');
+  const flagSound = new Audio('/sounds/flag.wav');
+  const incorrectSound = new Audio('/sounds/incorrect.wav');
+  const newGameSound = new Audio('/sounds/newGame.wav');
+  explosionSound.preload = 'auto';
+  chimeSound.preload = 'auto';
+  flagSound.preload = 'auto';
+  incorrectSound.preload = 'auto';
+  newGameSound.preload = 'auto';
+  explosionSound.volume = 0.5;
+  chimeSound.volume = 0.5;
+  flagSound.volume = 0.3;
+  incorrectSound.volume = 0.3;
+  newGameSound.volume = 0.5;
+
   let chatCount = 0;
 
   const isValidTile = (row: number, col: number): boolean => {
@@ -102,8 +120,10 @@ const Game: React.FC<GameProps> = ({ client }) => {
     // Update score based on if it's a bomb
     if (user) {
       if (gameboard[row][col] === TileContent.Mine) {
+        explosionSound.play();
         updateScores(user, SCORES.INCORRECT_CHECK_SCORE);
       } else {
+        chimeSound.play();
         updateScores(user, SCORES.CORRECT_CHECK_SCORE);
       }
     }
@@ -120,8 +140,10 @@ const Game: React.FC<GameProps> = ({ client }) => {
     // Update score based on if it's a bomb
     if (user) {
       if (gameboard[row][col] === TileContent.Mine) {
+        flagSound.play();
         updateScores(user, SCORES.CORRECT_FLAG_SCORE);
       } else {
+        incorrectSound.play();
         updateScores(user, SCORES.INCORRECT_FLAG_SCORE);
       }
     }
@@ -170,7 +192,7 @@ const Game: React.FC<GameProps> = ({ client }) => {
         }
       }
     }
-
+    if (gameboard.length) { newGameSound.play(); }
     setGameboard([...newBoard]);
   };
 

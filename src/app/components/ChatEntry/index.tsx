@@ -3,12 +3,10 @@ import styles from "./index.module.scss";
 import { Chat, RGBColor } from "@/app/types/types";
 import CooldownTimer from "../CooldownTimer";
 import { gsap } from "gsap";
-import { useWhooshSound } from "@/app/util/Sounds";
 
 type ChatEntryProps = { chat: Chat; timeoutLength: number };
 
 const ChatEntry: React.FC<ChatEntryProps> = ({ chat, timeoutLength }) => {
-  const { playWhooshSound } = useWhooshSound();
   const wordContRef = useRef(null);
   const color = chat.color || "#ffffff";
   const user = chat.user || "User";
@@ -73,8 +71,7 @@ const ChatEntry: React.FC<ChatEntryProps> = ({ chat, timeoutLength }) => {
         {
           maxHeight: 80,
           ease: "linear",
-          duration: 0.5,
-          onStart: playWhooshSound,
+          duration: 0.5
         }
       );
     }
