@@ -47,6 +47,7 @@ export default function Home() {
           const queryString = params.toString();
           const newUrl = queryString ? `?${queryString}` : '/';
           window.history.pushState(null, '', newUrl);
+          setClient(null);
         } else {
           connectionTries++;
         }
