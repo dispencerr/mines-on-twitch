@@ -55,6 +55,14 @@ const Game: React.FC<GameProps> = ({ client }) => {
   const [userScores, setUserScores] = useState<Scores>({}); // Object keeping track of users' scores
   const isConnected = client !== null;
 
+  const preloadSounds = () => {
+    Object.values(SOUNDS).forEach((sound) => {
+      const audio = new Audio(sound.file);
+      audio.volume = sound.volume;
+      audio.preload = 'auto';
+    });
+  };
+
   const playSound = (soundObject: Sound): void => {
     const soundFile = new Audio(soundObject.file);
     soundFile.volume = soundObject.volume;
@@ -288,6 +296,7 @@ const Game: React.FC<GameProps> = ({ client }) => {
         setChatMessages((prevChatMessages) => [...prevChatMessages, newChat]);
       });
     }
+    preloadSounds();
   }, []);
 
   // When a mod changes the board size, automatically set the number of mines to a ratio of the squared board size
