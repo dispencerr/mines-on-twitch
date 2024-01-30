@@ -27,26 +27,26 @@ export default function Home() {
   useEffect(() => {
     if (getClient) {
       setIsConnecting(true);
-      let tryConnection;
+      let tryConnection: NodeJS.Timeout;
       let connectionTries = 0;
 
       const checkConnection = () => {
         if (getClient.getChannels().length > 0) {
           setIsConnected(true);
           clearInterval(tryConnection);
-          const params = new URLSearchParams(searchParams.toString())
-          params.set('channel', getClient.getChannels()[0].slice(1))
-          window.history.pushState(null, '', `?${params.toString()}`)
+          const params = new URLSearchParams(searchParams.toString());
+          params.set("channel", getClient.getChannels()[0].slice(1));
+          window.history.pushState(null, "", `?${params.toString()}`);
         } else if (connectionTries >= 5) {
           clearInterval(tryConnection);
           alert("Connection failed");
           setChannel("");
           setIsConnecting(false);
-          const params = new URLSearchParams(searchParams.toString())
-          params.delete('channel');
+          const params = new URLSearchParams(searchParams.toString());
+          params.delete("channel");
           const queryString = params.toString();
-          const newUrl = queryString ? `?${queryString}` : '/';
-          window.history.pushState(null, '', newUrl);
+          const newUrl = queryString ? `?${queryString}` : "/";
+          window.history.pushState(null, "", newUrl);
           setClient(null);
         } else {
           connectionTries++;
