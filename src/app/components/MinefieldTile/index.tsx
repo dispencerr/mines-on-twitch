@@ -2,6 +2,8 @@ import React from "react";
 import styles from "./index.module.scss";
 import { TileContent } from "@/app/types/enums";
 
+const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
 type MinefieldTileProps = {
   row: number;
   col: number;
@@ -24,12 +26,9 @@ const MinefieldTile: React.FC<MinefieldTileProps> = ({
   isConnected,
 }) => {
   const displayCol = col + 1;
-  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
   /**
    * When a tile is clicked, reveal the tile
-   *
-   * @returns void
    */
   const handleClick = () => {
     checkTile(row, col, "User");
@@ -37,14 +36,18 @@ const MinefieldTile: React.FC<MinefieldTileProps> = ({
 
   /**
    * When a tile is right clicked, mark it as flagged and reveal it
-   *
-   * @returns void
+   * @param e - Event
    */
   const handleRightClick = (e) => {
     e.preventDefault();
     flagTile(row, col, "User");
   };
 
+  /**
+   * Generate the classes for the tile
+   *
+   * @returns the classes for the tile
+   */
   const getRevealedTileClasses = (): string => {
     let classString = `${styles.tile}`;
 
