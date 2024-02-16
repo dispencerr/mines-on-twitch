@@ -1,5 +1,6 @@
 import { Scores } from "@/app/types/types";
 import styles from "./index.module.scss";
+import React from "react";
 
 type ScoreboardProps = {
   userScores: Scores;
