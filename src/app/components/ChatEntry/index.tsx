@@ -63,7 +63,7 @@ const ChatEntry: React.FC<ChatEntryProps> = ({ chat, timeoutLength }) => {
   };
 
   const animateWordEntry = () => {
-    let wordCont = wordContRef.current;
+    const wordCont = wordContRef.current;
     if (wordCont) {
       gsap.fromTo(
         wordCont,
@@ -71,7 +71,7 @@ const ChatEntry: React.FC<ChatEntryProps> = ({ chat, timeoutLength }) => {
         {
           maxHeight: 80,
           ease: "linear",
-          duration: 0.5
+          duration: 0.5,
         }
       );
     }
