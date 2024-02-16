@@ -31,7 +31,7 @@ const MinefieldTile: React.FC<MinefieldTileProps> = ({
    *
    * @returns void
    */
-  const handleClick = (): void => {
+  const handleClick = () => {
     checkTile(row, col, "User");
   };
 
@@ -40,7 +40,7 @@ const MinefieldTile: React.FC<MinefieldTileProps> = ({
    *
    * @returns void
    */
-  const handleRightClick = (e): void => {
+  const handleRightClick = (e) => {
     e.preventDefault();
     flagTile(row, col, "User");
   };

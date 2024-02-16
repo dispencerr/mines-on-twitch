@@ -16,11 +16,11 @@ export default function Home() {
   const [isConnecting, setIsConnecting] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
 
-  const playOffline = (): void => {
+  const playOffline = () => {
     setIsConnected(true);
   };
 
-  const changeChannel = (channel: string): void => {
+  const changeChannel = (channel: string) => {
     setChannel(channel);
   };
 
