@@ -8,30 +8,33 @@ const CooldownTimer: React.FC<CooldownTimerProps> = ({ timeoutLength }) => {
   const timerCircleRef = useRef(null);
   const timeoutLengthInSeconds = timeoutLength / 1000;
 
+  /**
+   * Animate the cooldown timer
+   */
+  const startCooldownTimer = () => {
+    const timerCircle = timerCircleRef.current;
+
+    const tl = gsap.timeline();
+
+    // Animate the timer circle counterclockwise over three seconds
+    tl.to(timerCircle, {
+      "--p": "100",
+      duration: timeoutLengthInSeconds,
+      ease: "linear",
+    });
+    tl.to(timerCircle, {
+      "--c": "#88ff88",
+      duration: 0,
+      ease: "linear",
+    });
+    tl.to(timerCircle, {
+      opacity: 0,
+      duration: 0.3,
+      ease: "linear",
+    });
+  };
+
   useEffect(() => {
-    function startCooldownTimer() {
-      const timerCircle = timerCircleRef.current;
-
-      const tl = gsap.timeline();
-
-      // Animate the timer circle counterclockwise over three seconds
-      tl.to(timerCircle, {
-        "--p": "100",
-        duration: timeoutLengthInSeconds,
-        ease: "linear",
-      });
-      tl.to(timerCircle, {
-        "--c": "#88ff88",
-        duration: 0,
-        ease: "linear",
-      });
-      tl.to(timerCircle, {
-        opacity: 0,
-        duration: 0.3,
-        ease: "linear",
-      });
-    }
-
     startCooldownTimer();
   }, []);
 
