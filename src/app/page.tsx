@@ -20,7 +20,7 @@ export default function Home() {
     setIsConnected(true);
   };
 
-  const changeChannel = (channel: string) => {
+  const connectToChannel = (channel: string) => {
     setChannel(channel);
   };
 
@@ -87,7 +87,7 @@ export default function Home() {
           !isLoading ? (
             <>
               <StartingScreen
-                changeChannel={changeChannel}
+                connectToChannel={connectToChannel}
                 playOffline={playOffline}
               />
               <a
