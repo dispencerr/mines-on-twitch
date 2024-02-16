@@ -113,7 +113,7 @@ const ChatEntry: React.FC<ChatEntryProps> = ({ chat, timeoutLength }) => {
   return (
     <div className={styles.blockCont} ref={wordContRef}>
       <div className={styles.block}>
-        <CooldownTimer timeoutLength={timeoutLength} />
+        {user !== "User" && <CooldownTimer timeoutLength={timeoutLength} />}
         <span className={styles.user} style={{ color: adjustConstrast(color) }}>
           {user.length <= USERNAME_TRIM_CUTOFF
             ? user

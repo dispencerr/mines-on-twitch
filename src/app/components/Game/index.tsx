@@ -332,6 +332,7 @@ const Game: React.FC<GameProps> = ({ client }) => {
    * @param user - User to time out
    */
   const timeoutUser = (user: string) => {
+    if (!isConnected) return; // Don't time the player out in offline mode
     setTimeoutStatus((prevObject) => ({
       ...prevObject,
       [user]: true,
