@@ -7,8 +7,8 @@ type MinefieldProps = {
   gameboard: TileContent[][];
   revealStatus: boolean[][];
   flaggedStatus: boolean[][];
-  checkTile: (row: number, col: number, user?: string) => void;
-  flagTile: (row: number, col: number, user?: string) => void;
+  checkTile: (row: number, col: number, user: string) => void;
+  flagTile: (row: number, col: number, user: string) => void;
   isConnected: boolean;
 };
 
@@ -18,7 +18,7 @@ const Minefield: React.FC<MinefieldProps> = ({
   flaggedStatus,
   checkTile,
   flagTile,
-  isConnected
+  isConnected,
 }) => {
   return (
     <div

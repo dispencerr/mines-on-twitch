@@ -13,10 +13,12 @@ type GameProps = {
   client: Client | null;
 };
 
-const MINESWEEPER_GUESS_REGEX = /^([a-zA-Z])([0-2]?[0-9])(f|F)?$/i;
 const BOARD_RESET_TIMEOUT = 2000; // Delay before resetting the board after it is fully revealed (ms)
 const USER_TIMEOUT_LENGTH = 2000; // Timeout length before a user can make another guess (ms)
-const DEFAULT_MINE_RATIO = 0.15625;
+const DEFAULT_MINE_RATIO = 0.15625; // Default ratio of mine tiles on the board
+
+const MINIMUM_BOARD_SIZE = 2;
+const MAXIMUM_BOARD_SIZE = 26;
 
 const SCORES = {
   CORRECT_CHECK_SCORE: 1, // Score change for checking a safe tile
@@ -38,7 +40,39 @@ const SOUNDS = {
   newGameSound: { file: "/sounds/newgame.wav", volume: 0.5 },
 } as const;
 
+const MINESWEEPER_GUESS_REGEX = /^([a-zA-Z])([0-2]?[0-9])(f|F)?$/i; // Regex for a valid guess
 const COMMANDS_REGEX = `^(${COMMANDS.CHANGE_BOARD_SIZE}|${COMMANDS.CHANGE_NUMBER_OF_MINES})\\s(\\d+)$`;
+
+/**
+ * Convert a letter to a number (0-indexed)
+ *
+ * @param {string} letter - String to convert to a number
+ * @returns  {number} - The zero-indexed number for the letter (i.e. "a" is 0)
+ */
+const letterToNumber = (letter: string): number =>
+  letter.toLowerCase().charCodeAt(0) - "a".charCodeAt(0);
+
+/**
+ * Load the sounds into the game
+ */
+const preloadSounds = () => {
+  Object.values(SOUNDS).forEach((sound) => {
+    const audio = new Audio(sound.file);
+    audio.volume = sound.volume;
+    audio.preload = "auto";
+  });
+};
+
+/**
+ * Play a given sound
+ *
+ * @param {Sound} soundObject - Sound to be played
+ */
+const playSound = (soundObject: Sound) => {
+  const soundFile = new Audio(soundObject.file);
+  soundFile.volume = soundObject.volume;
+  soundFile.play();
+};
 
 const Game: React.FC<GameProps> = ({ client }) => {
   const [boardSize, setBoardSize] = useState<number>(8); // Game Board size (width)
@@ -49,43 +83,40 @@ const Game: React.FC<GameProps> = ({ client }) => {
   const [revealStatus, setRevealStatus] = useState<boolean[][]>([]); // 2D array of booleans indicating if the tile is revealed
   const [flaggedStatus, setFlaggedStatus] = useState<boolean[][]>([]); // 2D array of booleans indicating if the tile is flagged
   const [chatArray, setChatArray] = useState<Chat[]>([]); // The displayed chatbox (only of valid guesses)
-  const [chatMessages, setChatMessages] = useState<Chat[]>([]); // Array of all chats (not displayed)
+  const [latestChat, setLatestChat] = useState<Chat>(); // The latest chat message that will be checked for validity
   const [timeoutStatus, setTimeoutStatus] = useState<TimeoutStatus>({}); // Object keeping track of users' timeout status
   const [userScores, setUserScores] = useState<Scores>({}); // Object keeping track of users' scores
   const isConnected = client !== null;
 
-  const preloadSounds = () => {
-    Object.values(SOUNDS).forEach((sound) => {
-      const audio = new Audio(sound.file);
-      audio.volume = sound.volume;
-      audio.preload = "auto";
-    });
-  };
-
-  const playSound = (soundObject: Sound): void => {
-    const soundFile = new Audio(soundObject.file);
-    soundFile.volume = soundObject.volume;
-    soundFile.play();
-  };
-
   let chatCount = 0;
 
+  /**
+   * Check if a given tile is valid
+   *
+   * @param {number} row - row # of the tile
+   * @param {number} col - column # of the tile
+   * @returns {boolean} - If the tile is within the board
+   */
   const isValidTile = (row: number, col: number): boolean => {
     return row >= 0 && col >= 0 && row < boardSize && col < boardSize;
   };
 
+  /**
+   * Check if the board is fully revealed
+   *
+   * @returns {boolean} - If the board is fully revealed
+   */
   const isFullyRevealed = (): boolean => {
-    for (let row = 0; row < boardSize; row++) {
-      for (let col = 0; col < boardSize; col++) {
-        if (revealStatus[row][col] !== true) {
-          return false; // Found an unrevealed tile
-        }
-      }
-    }
-    return true; // All tiles are revealed
+    return revealStatus.every((row) => row.every((status) => status === true));
   };
 
-  const revealTile = (row: number, col: number): void => {
+  /**
+   * Reveal a specified tile on the board (does not affect score)
+   *
+   * @param {number} row - row # of the tile
+   * @param {number} col - column # of the tile
+   */
+  const revealTile = (row: number, col: number) => {
     if (!isValidTile(row, col)) {
       return;
     } // Outside the board
@@ -116,12 +147,19 @@ const Game: React.FC<GameProps> = ({ client }) => {
     // If all tiles are revealed, reinitialize
     if (isFullyRevealed()) {
       setTimeout(() => {
-        initializeBoard(boardSize);
+        initializeBoard();
       }, BOARD_RESET_TIMEOUT);
     }
   };
 
-  const checkTile = (row: number, col: number, user?: string): void => {
+  /**
+   * Check a tile and adjust the score of the user depending on whether it is a bomb or not
+   *
+   * @param {number} row - row # of the tile
+   * @param {number} col - column # of the tile
+   * @param {string} user - username whose score should be adjusted
+   */
+  const checkTile = (row: number, col: number, user: string) => {
     // Update score based on if it's a bomb
     if (user) {
       if (gameboard[row][col] === TileContent.Mine) {
@@ -136,8 +174,15 @@ const Game: React.FC<GameProps> = ({ client }) => {
     revealTile(row, col);
   };
 
-  const flagTile = (row: number, col: number, user?: string): void => {
-    // Update the state
+  /**
+   * Flag a tile and adjust the score of the user depending on whether it is a bomb or not
+   *
+   * @param {number} row - row # of the tile
+   * @param {number} col - column # of the tile
+   * @param {string} user - username whose score should be adjusted
+   */
+  const flagTile = (row: number, col: number, user: string) => {
+    // Update the flagged status state
     const updatedFlaggedStatus = [...flaggedStatus];
     updatedFlaggedStatus[row][col] = true;
     setFlaggedStatus(updatedFlaggedStatus);
@@ -157,21 +202,31 @@ const Game: React.FC<GameProps> = ({ client }) => {
     revealTile(row, col);
   };
 
-  const initializeBoard = (size: number): void => {
+  /**
+   * Initialize the game board
+   */
+  const initializeBoard = () => {
+    // Reset the chat states
     setChatArray([]);
-    setChatMessages([]);
+
+    // Reset the game board
     setGameboard([]);
-    const newBoard = Array.from({ length: size }, () =>
-      Array(size).fill(TileContent.Zero)
-    ); //Fill array with zeroes
+    const newBoard = Array.from({ length: boardSize }, () =>
+      Array(boardSize).fill(TileContent.Zero)
+    ); // Fill array with zeroes
     setRevealStatus(
-      Array.from({ length: size }, () => Array(size).fill(false))
+      Array.from({ length: boardSize }, () => Array(boardSize).fill(false))
     );
     setFlaggedStatus(
-      Array.from({ length: size }, () => Array(size).fill(false))
+      Array.from({ length: boardSize }, () => Array(boardSize).fill(false))
     );
 
-    const IncreaseCountOnTile = (row: number, col: number): void => {
+    /**
+     * Helper function that increases the number on a specified tile
+     * @param {number} row - row # of the tile
+     * @param {number} col - column # of the tile
+     */
+    const IncreaseCountOnTile = (row: number, col: number) => {
       if (!isValidTile(row, col)) {
         return;
       } // Outside the board
@@ -185,12 +240,12 @@ const Game: React.FC<GameProps> = ({ client }) => {
     for (let i = 0; i < numberOfMines; i++) {
       let randomRowIndex, randomColIndex;
       do {
-        randomRowIndex = Math.floor(Math.random() * size);
-        randomColIndex = Math.floor(Math.random() * size);
+        randomRowIndex = Math.floor(Math.random() * boardSize);
+        randomColIndex = Math.floor(Math.random() * boardSize);
       } while (newBoard[randomRowIndex][randomColIndex] === TileContent.Mine); // Ensure the selected index is not already a mine
       newBoard[randomRowIndex][randomColIndex] = TileContent.Mine;
 
-      // Update neighboring tiles
+      // Update the neighboring tiles of the new mine
       for (let rowOffset = -1; rowOffset <= 1; rowOffset++) {
         for (let colOffset = -1; colOffset <= 1; colOffset++) {
           const newRow = randomRowIndex + rowOffset;
@@ -199,29 +254,28 @@ const Game: React.FC<GameProps> = ({ client }) => {
         }
       }
     }
+
+    // Play the new game sound if it's not the first round
     if (gameboard.length) {
       playSound(SOUNDS.newGameSound);
     }
     setGameboard([...newBoard]);
   };
 
-  // Function called when a new tile is guessed
+  /**
+   * Function called when a new tile is guessed
+   *
+   * @param {Chat} newChat - The chat object containing the new guess
+   */
   const handleChatEntry = (newChat: Chat) => {
-    const userGuess = newChat.message.trim(); //twitch adds white space to allow the broadcaster to repeat the same chat repeatedly it seems
+    const userGuess = newChat.message;
 
-    // Convert the letter to a number (0-indexed)
-    const letterToNumber = (letter: string): number =>
-      letter.toLowerCase().charCodeAt(0) - "a".charCodeAt(0);
-
-    //Check that the chat message matches the regex for a valid guess
+    // Check that the chat message matches the regex for a valid guess
     const [, letter, numberStr, flag] =
       userGuess.match(MINESWEEPER_GUESS_REGEX) || [];
-    // console.log(userGuess);
-    // console.log(letter, numberStr, flag);
 
     if (letter && numberStr) {
       if (newChat.user && timeoutStatus[newChat.user]) return; // If user is timed out do nothing
-      // console.log("Valid guess");
       const row = letterToNumber(letter); // Convert the number to 0-indexed number
       const col = parseInt(numberStr) - 1; // Convert the number to 0-indexed
       if (isValidTile(row, col) && !revealStatus[row][col]) {
@@ -231,20 +285,17 @@ const Game: React.FC<GameProps> = ({ client }) => {
           checkTile(row, col, newChat.user);
         }
         setChatArray((prevChatArray) => [...prevChatArray, newChat]);
-        if (newChat.user) {
-          timeoutUser(newChat.user);
-        }
+        timeoutUser(newChat.user);
       }
     }
-    // Check if it's a mod command
+    // If it isn't a valid guess, check if it's a mod command
     else if (newChat.isMod) {
       const [, command, numberString] = userGuess.match(COMMANDS_REGEX) || [];
-      console.log(newChat, command, numberString, COMMANDS_REGEX);
       if (command && numberString) {
         const number = parseInt(numberString);
         switch (command) {
           case COMMANDS.CHANGE_BOARD_SIZE:
-            if (1 < number && number <= 26) {
+            if (MINIMUM_BOARD_SIZE <= number && number <= MAXIMUM_BOARD_SIZE) {
               setBoardSize(number);
             }
             break;
@@ -260,70 +311,94 @@ const Game: React.FC<GameProps> = ({ client }) => {
     }
   };
 
+  /**
+   * Update the score for a specific user
+   *
+   * @param {string} user - Username whose score to update
+   * @param {number} scoreChange - Number to increase the score by (or negative number to decrease)
+   */
   const updateScores = (user: string, scoreChange: number) => {
     const currentScore = userScores[user] || 0;
     const newScore = currentScore + scoreChange;
-    // console.log(user + "'s new score: " + newScore);
     setUserScores((prevScores) => ({
       ...prevScores,
       [user]: newScore,
     }));
   };
 
+  /**
+   * Time out a specific user, preventing them from guessing for a set amount of time
+   *
+   * @param user - User to time out
+   */
   const timeoutUser = (user: string) => {
     setTimeoutStatus((prevObject) => ({
       ...prevObject,
       [user]: true,
     }));
-    // console.log('Timed out ' + user);
     setTimeout(function () {
       setTimeoutStatus((prevObject) => ({
         ...prevObject,
         [user]: false,
       }));
-      // console.log('Untimed out ' + user);
     }, USER_TIMEOUT_LENGTH);
   };
 
+  /**
+   * On initial mounting, start listening for chat messages if connected to Twitch.
+   */
   useEffect(() => {
     if (isConnected) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       client.on("message", (channel, tags, message, self) => {
+        const trimmedMessage = message.trim(); // Twitch adds white space to allow the broadcaster to repeat the same chat repeatedly it seems
+        const user = tags["display-name"] || "User";
+        const color = tags["color"] || "#FFFFFF";
+        const isMod = tags.mod === true || tags.badges?.broadcaster === "1";
+
         const newChat: Chat = {
-          message: message,
-          user: tags["display-name"] || "User",
-          color: tags["color"] || "#FFFFFF",
-          isMod: tags.mod === true || tags.badges?.broadcaster === "1",
+          message: trimmedMessage,
+          user: user,
+          color: color,
+          isMod: isMod,
         };
-        setChatMessages((prevChatMessages) => [...prevChatMessages, newChat]);
+
+        setLatestChat(newChat);
       });
     }
     preloadSounds();
   }, []);
 
-  // When a mod changes the board size, automatically set the number of mines to a ratio of the squared board size
+  /**
+   * Call handleChatEntry when a new chat is added
+   */
+  useEffect(() => {
+    if (latestChat) {
+      handleChatEntry(latestChat);
+    }
+  }, [latestChat]);
+
+  /**
+   *  When a mod changes the board size, automatically set the number of mines to a ratio of the squared board size
+   */
   useEffect(() => {
     const newNumberOfMines = Math.max(
       1,
       Math.floor(boardSize ** 2 * DEFAULT_MINE_RATIO)
     );
     if (newNumberOfMines === numberOfMines) {
-      initializeBoard(boardSize);
+      initializeBoard();
     } else {
       setNumberOfMines(newNumberOfMines);
     }
   }, [boardSize]);
 
+  /**
+   * Reinitialize the board if the number of mines changes
+   */
   useEffect(() => {
-    initializeBoard(boardSize);
+    initializeBoard();
   }, [numberOfMines]);
-
-  useEffect(() => {
-    if (chatMessages.length) {
-      const latestChat = chatMessages[chatMessages.length - 1];
-      handleChatEntry(latestChat);
-    }
-  }, [chatMessages]);
 
   return (
     <>

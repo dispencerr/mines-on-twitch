@@ -8,8 +8,8 @@ type MinefieldTileProps = {
   content: TileContent;
   isRevealed: boolean;
   isFlagged: boolean;
-  checkTile: (row: number, col: number, user?: string) => void;
-  flagTile: (row: number, col: number, user?: string) => void;
+  checkTile: (row: number, col: number, user: string) => void;
+  flagTile: (row: number, col: number, user: string) => void;
   isConnected: boolean;
 };
 
@@ -21,7 +21,7 @@ const MinefieldTile: React.FC<MinefieldTileProps> = ({
   isFlagged,
   checkTile,
   flagTile,
-  isConnected
+  isConnected,
 }) => {
   const displayCol = col + 1;
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -98,7 +98,9 @@ const MinefieldTile: React.FC<MinefieldTileProps> = ({
     </div>
   ) : (
     <div
-      className={`${styles.tile} ${styles.unrevealedTile} ${!isConnected ? '' : styles.clickDisabled}`}
+      className={`${styles.tile} ${styles.unrevealedTile} ${
+        !isConnected ? "" : styles.clickDisabled
+      }`}
       onClick={!isConnected ? handleClick : undefined}
       onContextMenu={!isConnected ? handleRightClick : undefined}
     >
