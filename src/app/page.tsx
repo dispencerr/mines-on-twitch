@@ -6,6 +6,7 @@ import styles from "./page.module.scss";
 import Game from "@/app/components/Game";
 import StartingScreen from "@/app/components/StartingScreen";
 import { Client } from "tmi.js";
+import tmi from "tmi.js";
 
 export default function Home() {
   const searchParams = useSearchParams();
@@ -14,7 +15,6 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
-  const tmi = require("tmi.js");
 
   const playOffline = (): void => {
     setIsConnected(true);
@@ -27,6 +27,7 @@ export default function Home() {
   useEffect(() => {
     if (getClient) {
       setIsConnecting(true);
+      // eslint-disable-next-line prefer-const
       let tryConnection: NodeJS.Timeout;
       let connectionTries = 0;
 
@@ -59,7 +60,7 @@ export default function Home() {
 
   useEffect(() => {
     if (getChannel) {
-      let client: Client = new tmi.Client({
+      const client: Client = new tmi.Client({
         channels: [getChannel],
       });
       setClient(client);

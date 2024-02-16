@@ -31,15 +31,14 @@ const COMMANDS = {
 } as const;
 
 const SOUNDS = {
-  explosionSound: { file: '/sounds/explosion.wav', volume: 0.5 },
-  chimeSound: { file: '/sounds/chime.wav', volume: 0.5 },
-  flagSound: { file: '/sounds/flag.wav', volume: 0.3 },
-  incorrectSound: { file: '/sounds/incorrect.wav', volume: 0.3 },
-  newGameSound: { file: '/sounds/newgame.wav', volume: 0.5 },
+  explosionSound: { file: "/sounds/explosion.wav", volume: 0.5 },
+  chimeSound: { file: "/sounds/chime.wav", volume: 0.5 },
+  flagSound: { file: "/sounds/flag.wav", volume: 0.3 },
+  incorrectSound: { file: "/sounds/incorrect.wav", volume: 0.3 },
+  newGameSound: { file: "/sounds/newgame.wav", volume: 0.5 },
 } as const;
 
 const COMMANDS_REGEX = `^(${COMMANDS.CHANGE_BOARD_SIZE}|${COMMANDS.CHANGE_NUMBER_OF_MINES})\\s(\\d+)$`;
-
 
 const Game: React.FC<GameProps> = ({ client }) => {
   const [boardSize, setBoardSize] = useState<number>(8); // Game Board size (width)
@@ -59,7 +58,7 @@ const Game: React.FC<GameProps> = ({ client }) => {
     Object.values(SOUNDS).forEach((sound) => {
       const audio = new Audio(sound.file);
       audio.volume = sound.volume;
-      audio.preload = 'auto';
+      audio.preload = "auto";
     });
   };
 
@@ -67,7 +66,7 @@ const Game: React.FC<GameProps> = ({ client }) => {
     const soundFile = new Audio(soundObject.file);
     soundFile.volume = soundObject.volume;
     soundFile.play();
-  }
+  };
 
   let chatCount = 0;
 
@@ -126,10 +125,10 @@ const Game: React.FC<GameProps> = ({ client }) => {
     // Update score based on if it's a bomb
     if (user) {
       if (gameboard[row][col] === TileContent.Mine) {
-        playSound(SOUNDS.explosionSound)
+        playSound(SOUNDS.explosionSound);
         updateScores(user, SCORES.INCORRECT_CHECK_SCORE);
       } else {
-        playSound(SOUNDS.chimeSound)
+        playSound(SOUNDS.chimeSound);
         updateScores(user, SCORES.CORRECT_CHECK_SCORE);
       }
     }
@@ -146,10 +145,10 @@ const Game: React.FC<GameProps> = ({ client }) => {
     // Update score based on if it's a bomb
     if (user) {
       if (gameboard[row][col] === TileContent.Mine) {
-        playSound(SOUNDS.flagSound)
+        playSound(SOUNDS.flagSound);
         updateScores(user, SCORES.CORRECT_FLAG_SCORE);
       } else {
-        playSound(SOUNDS.incorrectSound)
+        playSound(SOUNDS.incorrectSound);
         updateScores(user, SCORES.INCORRECT_FLAG_SCORE);
       }
     }
@@ -162,7 +161,7 @@ const Game: React.FC<GameProps> = ({ client }) => {
     setChatArray([]);
     setChatMessages([]);
     setGameboard([]);
-    let newBoard = Array.from({ length: size }, () =>
+    const newBoard = Array.from({ length: size }, () =>
       Array(size).fill(TileContent.Zero)
     ); //Fill array with zeroes
     setRevealStatus(
@@ -201,14 +200,14 @@ const Game: React.FC<GameProps> = ({ client }) => {
       }
     }
     if (gameboard.length) {
-      playSound(SOUNDS.newGameSound)
+      playSound(SOUNDS.newGameSound);
     }
     setGameboard([...newBoard]);
   };
 
   // Function called when a new tile is guessed
   const handleChatEntry = (newChat: Chat) => {
-    let userGuess = newChat.message.trim(); //twitch adds white space to allow the broadcaster to repeat the same chat repeatedly it seems
+    const userGuess = newChat.message.trim(); //twitch adds white space to allow the broadcaster to repeat the same chat repeatedly it seems
 
     // Convert the letter to a number (0-indexed)
     const letterToNumber = (letter: string): number =>
@@ -262,8 +261,8 @@ const Game: React.FC<GameProps> = ({ client }) => {
   };
 
   const updateScores = (user: string, scoreChange: number) => {
-    let currentScore = userScores[user] || 0;
-    let newScore = currentScore + scoreChange;
+    const currentScore = userScores[user] || 0;
+    const newScore = currentScore + scoreChange;
     // console.log(user + "'s new score: " + newScore);
     setUserScores((prevScores) => ({
       ...prevScores,
@@ -288,6 +287,7 @@ const Game: React.FC<GameProps> = ({ client }) => {
 
   useEffect(() => {
     if (isConnected) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       client.on("message", (channel, tags, message, self) => {
         const newChat: Chat = {
           message: message,
@@ -320,7 +320,7 @@ const Game: React.FC<GameProps> = ({ client }) => {
 
   useEffect(() => {
     if (chatMessages.length) {
-      let latestChat = chatMessages[chatMessages.length - 1];
+      const latestChat = chatMessages[chatMessages.length - 1];
       handleChatEntry(latestChat);
     }
   }, [chatMessages]);

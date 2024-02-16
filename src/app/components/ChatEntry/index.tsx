@@ -50,7 +50,7 @@ const ChatEntry: React.FC<ChatEntryProps> = ({ chat, timeoutLength }) => {
     }
 
     // Increase brightness of the color until contrast is met
-    let adjustedColor: RGBColor = [...color];
+    const adjustedColor: RGBColor = [...color];
     while (contrastRatio(adjustedColor, background) < 4.5) {
       for (let i = 0; i < 3; i++) {
         adjustedColor[i] = Math.min(255, adjustedColor[i] + 10);
