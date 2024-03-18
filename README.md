@@ -2,7 +2,7 @@
 
 A Minesweeper-like game that reads Twitch chat for moves and gives points.
 
-For streamers, add <span>https://mines-on-twitch.vercel.app/?channel=YourChannelName</span> as a browser source in your streaming application. Recommended size is 1600x900 and resize to fit your layout.
+For streamers, add [https://mines-on-twitch.vercel.app/?channel=***YourChannelName***](https://mines-on-twitch.vercel.app/?channel=YourChannelName) as a browser source in your streaming application. Recommended size is 1600x900 and resize to fit your layout.
 
 ## Commands
 
