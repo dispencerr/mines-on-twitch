@@ -1,8 +1,9 @@
 @import "@/app/styles/mixins";
 
 .game {
-  width: 100%;
   display: flex;
+  width: 100%;
+  height: 60vh;
   justify-content: space-between;
 }
 
@@ -42,18 +43,17 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  align-self: flex-end;
-  align-items: center;
-  max-height: varSize(424);
+  justify-content: flex-end;
+  align-items: flex-end;
 }
 
 .chatboxContainer {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  align-items: flex-start;
-  overflow-y: clip;
+  align-items: flex-end;
   width: 100%;
+  overflow: hidden;
 }
 
 .howToPlay {

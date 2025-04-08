@@ -1,10 +1,5 @@
 @import "@/app/styles/mixins";
 
-.blockCont {
-  overflow-y: clip;
-  flex-shrink: 0;
-}
-
 .block {
   position: relative;
   display: flex;
@@ -19,12 +14,13 @@
   font-weight: bold;
   margin-right: varSize(10);
   align-self: center;
-  min-width: varSize(140);
+  width: varSize(170);
 }
 
 .word {
   display: flex;
   align-items: center;
+  min-width: varSize(45);
 }
 
 .scoreBonus {
