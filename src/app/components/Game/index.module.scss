@@ -40,6 +40,7 @@
 .rightContainer {
   width: varSize(300);
   height: 100%;
+  max-height: varSize(594);
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
