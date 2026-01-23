@@ -66,7 +66,7 @@ export default function HomeClient() {
     const channelParam = searchParams.get("channel");
     if (channelParam) {
       setIsConnecting(true);
-      setChannel(channelParam);
+      setChannel(channelParam.toLowerCase());
     }
     setIsLoading(false);
   }, [searchParams]);
