@@ -8,7 +8,7 @@
     "target": "es2017",
     "module": "commonjs",
     "strictNullChecks": true,
-    "jsx": "react-jsx",
+    "jsx": "preserve",
     "lib": [
       "dom",
       "dom.iterable",
